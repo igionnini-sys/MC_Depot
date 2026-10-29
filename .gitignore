@@ -1,0 +1,8 @@
+node_modules/
+dist/
+*.log
+.DS_Store
+__pycache__/
+# Vecchia app Streamlit: solo riferimento locale, non va nel repository
+oldCode/
+.claude/
