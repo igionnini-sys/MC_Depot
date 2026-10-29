@@ -28,12 +28,24 @@ export const DEFAULT_PARAMS: SimulationParams = {
   withdrawal: 12000,
   capitalGainsTaxRate: 26,
   nSimulations: 10000,
+  taxCountry: 'simplified',
+  currentAge: 30,
+  startYear: 2027,
+  filingStatus: 'single',
+  kirchensteuer: 'none',
+  childrenCount: 0,
+  accumulationMarginalTaxRate: 35,
+  otherRetirementIncome: 0,
+  contributionSplitMode: 'auto',
+  manualAvdContribution: 1800,
+  indexTaxLimitsToInflation: false,
+  taxLimitsInflationRate: 2.5,
 };
 
 export type Action =
   | { type: 'lang'; lang: Lang }
   | { type: 'theme'; theme: Theme }
-  | { type: 'param'; key: keyof SimulationParams; value: number | boolean }
+  | { type: 'param'; key: keyof SimulationParams; value: number | boolean | string }
   | { type: 'samePortfolio'; value: boolean }
   | { type: 'selectProfile'; phase: Phase; profile: string }
   | { type: 'loadProfile'; phase: Phase }
@@ -43,9 +55,10 @@ export type Action =
   | { type: 'correlation'; enabled?: boolean; scenario?: ScenarioKey }
   | { type: 'resetAll' };
 
-const STORAGE_KEY = 'finret.state.v1';
+export const STORAGE_KEY = 'finret.state.v2';
+export const LEGACY_STORAGE_KEY_V1 = 'finret.state.v1';
 
-function initialState(): AppState {
+export function initialState(): AppState {
   const acc = getProfileData(DEFAULT_ACCUMULATION_PROFILE);
   const navLang = typeof navigator !== 'undefined' && navigator.language?.toLowerCase().startsWith('it') ? 'it' : 'en';
   return {
@@ -59,19 +72,35 @@ function initialState(): AppState {
   };
 }
 
+/** Merges saved v1 or v2 state with defaults so missing fields are populated cleanly. */
+export function migrateState(saved: Partial<AppState> | null | undefined, base: AppState = initialState()): AppState {
+  if (!saved || typeof saved !== 'object') return base;
+  const mergedParams: SimulationParams = { ...base.params, ...saved.params };
+  if (saved.params?.taxLimitsInflationRate === undefined && typeof saved.params?.inflation === 'number') {
+    mergedParams.taxLimitsInflationRate = saved.params.inflation;
+  }
+  return {
+    ...base,
+    ...saved,
+    params: mergedParams,
+    selectedProfile: { ...base.selectedProfile, ...saved.selectedProfile },
+    assets: saved.assets?.accumulation?.length ? saved.assets : base.assets,
+    correlation: { ...base.correlation, ...saved.correlation },
+  };
+}
+
 function load(): AppState {
   const init = initialState();
   try {
-    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? 'null') as Partial<AppState> | null;
-    if (!saved) return init;
-    return {
-      ...init,
-      ...saved,
-      params: { ...init.params, ...saved.params },
-      selectedProfile: { ...init.selectedProfile, ...saved.selectedProfile },
-      assets: saved.assets?.accumulation?.length ? saved.assets : init.assets,
-      correlation: { ...init.correlation, ...saved.correlation },
-    };
+    const rawV2 = localStorage.getItem(STORAGE_KEY);
+    if (rawV2) {
+      return migrateState(JSON.parse(rawV2) as Partial<AppState>, init);
+    }
+    const rawV1 = localStorage.getItem(LEGACY_STORAGE_KEY_V1);
+    if (rawV1) {
+      return migrateState(JSON.parse(rawV1) as Partial<AppState>, init);
+    }
+    return init;
   } catch {
     return init;
   }

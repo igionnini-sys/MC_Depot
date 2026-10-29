@@ -1,13 +1,13 @@
 # Prossimi passi — da dove riprendere
 
-Ultimo aggiornamento: **2026-10-29**. Stato: Fase 1 (conversione) completata; per la Fase 4 (fiscalità multi-paese) esistono solo piano e prompt. **Nessun codice fiscale è stato scritto.**
+Ultimo aggiornamento: **2026-10-29**. Stato: Fase 1 completata; **Passi 0, 1, 2 e 3 della Fase 4 completati**. Prossimo passo: **Passo 4** (Interfaccia e risultati fiscali per paese/contenitore).
 
 Documenti: [PROGRESS.md](PROGRESS.md) · [docs/piano-fiscalita-multipaese.md](docs/piano-fiscalita-multipaese.md) · [docs/prompt-fiscalita-multipaese.md](docs/prompt-fiscalita-multipaese.md)
 
 ## Decisioni prese dall'utente (2026-10-29)
 
 1. **Nominale vs reale: restano attive entrambe le possibilità.** Non tutto in nominale: nel tempo i limiti fissi (franchigie, tetti, scaglioni) possono cambiare in relazione all'inflazione.
-   - *Interpretazione da confermare:* il motore calcola internamente in modo coerente (euro nominali, per evitare il doppio conteggio dell'inflazione), mentre i **limiti fiscali** hanno un'opzione "fissi nominali" oppure "indicizzati all'inflazione" (con tasso configurabile). I risultati si possono vedere in euro nominali o in potere d'acquisto di oggi.
+   - *Confermato e implementato nel Passo 0:* il motore calcola internamente in modo coerente in euro nominali (evitando il doppio conteggio dell'inflazione), mentre i **limiti fiscali** hanno l'opzione "fissi nominali" oppure "indicizzati all'inflazione" (`indexTaxLimitsToInflation`, `taxLimitsInflationRate`, funzione `taxLimitFactor`). I risultati si possono vedere in euro nominali o in potere d'acquisto di oggi.
 2. **Prelievo: si indica il netto desiderato**; il motore calcola il lordo (gross-up).
 3. **Versamenti: l'utente indica il versamento totale annuo**, con due modalità:
    - **Automatico:** priorità all'Altersvorsorgedepot fino alla soglia (tetto da file parametri, 6.840 € da verificare); l'eccedenza va nel deposito ordinario.
@@ -16,10 +16,12 @@ Documenti: [PROGRESS.md](PROGRESS.md) · [docs/piano-fiscalita-multipaese.md](do
 
 ## Da dove ripartire (ordine)
 
-1. **Confermare l'interpretazione del punto 1** (una riga di risposta dell'utente).
-2. **Passo 0** — motore coerente (nominale interno) + opzione di indicizzazione dei limiti fiscali; aggiornare i test e `PROGRESS.md` (risolve Fase 2, punti 1–2).
-3. **Passo 1** — struttura `src/tax/`, regime `simplified` identico all'attuale, selettore paese, nuovi input (decisione 4) e modalità versamento (decisione 3), stato salvato v2 con migrazione.
-4. **Passi 2–3** — Germania (deposito ordinario, poi Altersvorsorgedepot 2027), poi UI (Passo 4), Italia (5), Paesi Bassi (6), chiusura (7).
+1. [x] **Confermare l'interpretazione del punto 1** — confermata.
+2. [x] **Passo 0** — motore coerente (nominale interno) + opzione di indicizzazione dei limiti fiscali; aggiornati i test e `PROGRESS.md` (risolve Fase 2, punti 1–3).
+3. [x] **Passo 1** — struttura `src/tax/`, regime `simplified` identico all'attuale, selettore paese, nuovi input (decisione 4) e modalità versamento (decisione 3), stato salvato v2 con migrazione.
+4. [x] **Passo 2** — Germania: deposito ordinario (`src/tax/params/de.json`, `src/tax/grossUp.ts`, `src/tax/de/brokerage.ts`, 20/20 test verdi).
+5. [x] **Passo 3** — Germania: Altersvorsorgedepot 2027 (`src/tax/common/progressive.ts`, `src/tax/de/guenstigerpruefung.ts`, `src/tax/de/altersvorsorgedepot.ts`, 25/25 test verdi).
+6. **Passo 4** *(prossimo)* — Interfaccia e risultati (`ParametersPanel.tsx`, `ResultsView.tsx`, `translations.ts`, dettaglio per contenitore AVD vs Deposito ordinario, Zulage e avviso `verified: false`), poi Italia (Passo 5), Paesi Bassi (Passo 6), chiusura (Passo 7).
 
 ## Ancora aperto
 

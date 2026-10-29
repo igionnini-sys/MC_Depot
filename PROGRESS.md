@@ -56,14 +56,14 @@ mantenendo inizialmente **le stesse funzionalità** con un'interfaccia nuova.
 
 Le differenze sono nel rumore Monte Carlo (semi casuali diversi).
 
-### Fase 2 — Revisione del modello (da decidere con l'utente) ⏳
+### Fase 2 — Revisione del modello ✅ (punti 1–3 risolti nel Passo 0 della Fase 4)
 
-Anomalie del modello originale **mantenute volutamente** per avere parità di numeri; vanno decise prima di cambiarle:
+Anomalie del modello originale corrette nel Passo 0:
 
-1. **Doppio conteggio dell'inflazione in pensione.** Al pensionamento il saldo resta *nominale*, ma viene fatto crescere con il rendimento *reale* (nominale − inflazione), mentre i prelievi sono gonfiati *nominalmente* (`prelievo × (1+i)^(anni)`). L'inflazione pesa due volte → risultati pessimistici. Inoltre il "valore finale" è in unità miste e la vista "Valori finali reali" lo deflaziona di nuovo.
-2. **Rendimento reale diverso tra i due motori**: indipendente usa `nominale − inflazione`, correlato usa la forma esatta `(1+n)/(1+i) − 1`.
-3. **"Efficacia prelievo"** confronta il prelievo netto medio *nominale* con l'importo in euro *di oggi* → valori > 100% (es. 290%).
-4. Analisi del rischio e probabilità di perdita calcolate sull'accumulo **nominale** contro il totale depositato (nominale): con orizzonti lunghi la probabilità di perdita è quasi sempre ~0%.
+1. [x] **Doppio conteggio dell'inflazione in pensione.** Risolto: il portafoglio cresce con il rendimento *nominale* anche durante il pensionamento, e il valore finale è in euro nominali coerenti (deflazionato una sola volta nella vista "Valori finali reali").
+2. [x] **Rendimento reale diverso tra i due motori**: risolto (entrambi i motori usano il rendimento nominale nel ciclo annuale).
+3. [x] **"Efficacia prelievo"**: risolto (con prelievo reale, il prelievo netto annuo è deflazionato all'anno del prelievo per essere confrontato omogeneamente con l'importo desiderato in potere d'acquisto di oggi).
+4. [ ] Analisi del rischio e probabilità di perdita calcolate sull'accumulo **nominale** contro il totale depositato (nominale): con orizzonti lunghi la probabilità di perdita è quasi sempre ~0%.
 
 ### Fase 3 — Pacchetti nativi ⏳
 
@@ -71,16 +71,16 @@ Anomalie del modello originale **mantenute volutamente** per avere parità di nu
 - [ ] Android: wrapper **Capacitor** (APK/AAB) oppure TWA (Trusted Web Activity) partendo dalla PWA
 - [ ] Hosting statico della PWA (GitHub Pages / Netlify) per installazione diretta da browser
 
-### Fase 4 — Fiscalità multi-paese (Germania → Italia → Paesi Bassi) 📝 (pianificata)
+### Fase 4 — Fiscalità multi-paese (Germania → Italia → Paesi Bassi) 🚧 (in corso)
 
 Piano: [docs/piano-fiscalita-multipaese.md](docs/piano-fiscalita-multipaese.md) · Prompt AI: [docs/prompt-fiscalita-multipaese.md](docs/prompt-fiscalita-multipaese.md)
 
 - [x] Decisioni dell'utente salvate in [NEXT_STEPS.md](NEXT_STEPS.md) (2026-10-29): nominale e reale entrambi attivi, prelievo netto, versamento totale con ripartizione automatica/manuale AVD, nuovi input personali
-- [ ] Ancora da confermare: interpretazione del punto "nominale/reale", Teilfreistellung per asset, parametri normativi
-- [ ] Passo 0 — Modello coerente in euro nominali (risolve Fase 2, punti 1–2)
-- [ ] Passo 1 — Struttura `src/tax/`, regime `simplified` identico all'attuale, selettore paese, stato salvato v2
-- [ ] Passo 2 — Germania: deposito ordinario (Abgeltungsteuer, Soli/KiSt, Sparer-Pauschbetrag, Teilfreistellung, Vorabpauschale, gross-up)
-- [ ] Passo 3 — Germania: Altersvorsorgedepot 2027 (Zulage, Günstigerprüfung, decumulo con tariffa progressiva)
+- [x] Confermata interpretazione "nominale/reale" e Teilfreistellung di default per asset
+- [x] Passo 0 — Modello coerente in euro nominali + `taxLimitFactor` per l'indicizzazione opzionale dei limiti fiscali (risolve Fase 2, punti 1–3)
+- [x] Passo 1 — Struttura `src/tax/`, regime `simplified` identico all'attuale, selettore paese, nuovi input personali e di ripartizione versamenti, stato salvato `finret.state.v2` con migrazione da `v1`
+- [x] Passo 2 — Germania: deposito ordinario (Abgeltungsteuer, Soli/KiSt, Sparer-Pauschbetrag, Teilfreistellung, Vorabpauschale, gross-up)
+- [x] Passo 3 — Germania: Altersvorsorgedepot 2027 (Zulage, Günstigerprüfung, decumulo con tariffa progressiva)
 - [ ] Passo 4 — Interfaccia e risultati fiscali per paese/contenitore
 - [ ] Passo 5 — Italia · [ ] Passo 6 — Paesi Bassi · [ ] Passo 7 — Chiusura e disclaimer
 
@@ -138,3 +138,7 @@ FinRet/
 
 - **2026-10-29** — Fase 1 completata: conversione completa a PWA React/TS, parità numerica verificata contro il motore Python, test verdi, verifica visiva desktop/mobile.
 - **2026-10-29** — Creati il piano di lavoro e il prompt AI per la fiscalità multi-paese (Fase 4); nessun codice ancora modificato. Aggiunto `avvia-app.bat` per l'avvio rapido.
+- **2026-10-29** — Fase 4, Passo 0 completato: motore interno coerente in euro nominali (risolti i punti 1, 2 e 3 della Fase 2), aggiunta funzione `taxLimitFactor` e opzioni `indexTaxLimitsToInflation` / `taxLimitsInflationRate` in `SimulationParams`, aggiunti test deterministici su decumulo e indicizzazione limiti.
+- **2026-10-29** — Fase 4, Passo 1 completato: struttura plug-in `src/tax/` (`types.ts`, `registry.ts`, stub `de`, `it`, `nl`), regime `simplified` bit-a-bit identico a parità di seme, nuovi input in UI (`ParametersPanel.tsx`) e traduzioni IT/EN, persistenza `finret.state.v2` con migrazione da `v1`, 14/14 test verdi e build pulita.
+- **2026-10-29** — Fase 4, Passo 2 completato: deposito ordinario Germania (`src/tax/params/de.json`, `src/tax/grossUp.ts`, `src/tax/de/brokerage.ts`, `src/tax/de/brokerage.test.ts`), Abgeltungsteuer + Soli + Kirchensteuer, Sparer-Pauschbetrag, Teilfreistellung ponderata ed esenzione ETC (Gold/Commodities) da Vorabpauschale, tracciamento cumulativo Vorabpauschale lorda e deduzione alla vendita, compensazione perdite, gross-up (proporzionale e FIFO), 20/20 test verdi (< 420 ms per 10.000 simulazioni).
+- **2026-10-29** — Fase 4, Passo 3 completato: Germania Altersvorsorgedepot 2027 (`src/tax/common/progressive.ts`, `src/tax/de/guenstigerpruefung.ts`, `src/tax/de/altersvorsorgedepot.ts`, `src/tax/de/altersvorsorgedepot.test.ts`), accumulo esente da tasse con Zulage (50% fino a 360 € + 25% fino a 1.800 € + 300 € per figlio) e Günstigerprüfung, ripartizione automatica/manuale con tetto 6.840 €, decumulo con età minima 65, quota forfettaria ≤ 30% e tariffa progressiva § 32a EStG con inversione analitica $O(1)$ (`grossUpGermanIncomeTax`), 25/25 test verdi (~313 ms per 10.000 simulazioni con entrambi i contenitori attivi).

@@ -1,0 +1,94 @@
+{
+  "country": "de",
+  "description": "German tax parameters: ordinary brokerage (Abgeltungsteuer, InvStG Vorabpauschale), Altersvorsorgedepot 2027 draft, and § 32a EStG income tax tariff.",
+  "brokerage": {
+    "abgeltungsteuerRate": {
+      "value": 0.25,
+      "source": "§ 32d Abs. 1 EStG",
+      "verified": true
+    },
+    "solidaritaetszuschlagRate": {
+      "value": 0.055,
+      "source": "§ 4 SolZG 1995",
+      "verified": true
+    },
+    "kirchensteuerRates": {
+      "none": 0,
+      "8": 0.08,
+      "9": 0.09,
+      "source": "§ 51a EStG / Landeskirchensteuergesetze (8% BY/BW, 9% other Länder)",
+      "verified": true
+    },
+    "sparerPauschbetrag": {
+      "single": 1000,
+      "couple": 2000,
+      "source": "§ 20 Abs. 9 EStG (since 01/01/2023)",
+      "verified": true
+    },
+    "basisertragFactor": {
+      "value": 0.7,
+      "source": "§ 18 Abs. 1 Satz 2 InvStG",
+      "verified": true
+    },
+    "teilfreistellungByAsset": {
+      "Stocks": { "rate": 0.30, "isFund": true, "source": "§ 20 Abs. 1 InvStG (Aktienfonds >= 50% equities)", "verified": true },
+      "REIT": { "rate": 0.30, "isFund": true, "source": "§ 20 Abs. 1 InvStG (modeled as equity REIT ETF; real-estate funds under § 20 Abs. 3 are 60%/80%)", "verified": false },
+      "Bond": { "rate": 0.0, "isFund": true, "source": "§ 20 InvStG (Rentenfonds)", "verified": true },
+      "Cash": { "rate": 0.0, "isFund": false, "source": "Bank deposits / money market without fund wrapper", "verified": true },
+      "Gold": { "rate": 0.0, "isFund": false, "source": "ETC (bearer debt security, not an investment fund under InvStG)", "verified": true },
+      "Commodities": { "rate": 0.0, "isFund": false, "source": "ETC (bearer debt security, not an investment fund under InvStG)", "verified": true },
+      "UserAsset1": { "rate": 0.30, "isFund": true, "source": "Default user equity fund assumption", "verified": false },
+      "UserAsset2": { "rate": 0.0, "isFund": true, "source": "Default user non-equity fund assumption", "verified": false }
+    },
+    "basiszinsByYear": {
+      "default": { "value": 0.0253, "source": "Fallback projection based on BMF 2025 Basiszins", "verified": false },
+      "years": {
+        "2020": { "value": 0.0007, "source": "BMF-Schreiben IV C 1 - S 1980-1/19/10389 :002", "verified": true },
+        "2021": { "value": -0.0045, "source": "BMF-Schreiben IV C 1 - S 1980-1/19/10389 :004", "verified": true },
+        "2022": { "value": -0.0005, "source": "BMF-Schreiben IV C 1 - S 1980-1/19/10389 :005", "verified": true },
+        "2023": { "value": 0.0255, "source": "BMF-Schreiben vom 04.01.2023", "verified": true },
+        "2024": { "value": 0.0229, "source": "BMF-Schreiben vom 05.01.2024", "verified": true },
+        "2025": { "value": 0.0253, "source": "BMF-Schreiben vom 02.01.2025", "verified": true },
+        "2026": { "value": 0.0253, "source": "Projection / placeholder until official BMF publication", "verified": false },
+        "2027": { "value": 0.0253, "source": "Projection / placeholder for simulation horizon", "verified": false }
+      }
+    }
+  },
+  "altersvorsorgedepot": {
+    "effectiveYear": { "value": 2027, "source": "BMF Referentenentwurf Altersvorsorgereformgesetz (pensions reform draft)", "verified": false },
+    "maxAnnualContribution": { "value": 6840, "source": "User specification / draft reform notes (6,840 €/year cap)", "verified": false },
+    "zulage": {
+      "tier1Limit": 360,
+      "tier1Rate": 0.50,
+      "tier2Limit": 1800,
+      "tier2Rate": 0.25,
+      "childAllowance": 300,
+      "source": "User specification / draft reform notes (50% up to 360 € = 180 € + 25% from 360 € to 1,800 € = 360 € -> max base 540 € + 300 € per child)",
+      "verified": false
+    },
+    "guenstigerpruefung": {
+      "deductionBaseIncludesZulage": true,
+      "reinvestTaxRefundInBrokerage": true,
+      "source": "Analogy to § 10a EStG (Riester Sonderausgabenabzug: own contribution + Zulage capped at maxAnnualContribution; to verify in final law)",
+      "verified": false
+    },
+    "minPayoutAge": { "value": 65, "source": "User specification / draft reform notes", "verified": false },
+    "maxLumpSumShare": { "value": 0.30, "source": "User specification / draft reform notes (up to 30% one-off capital payout; taxed as deferred income)", "verified": false }
+  },
+  "incomeTaxTariff": {
+    "source": "§ 32a Abs. 1 EStG (2025/2026 tariff structure used as baseline for 2027+ simulation)",
+    "verified": false,
+    "zones": {
+      "grundfreibetrag": 12096,
+      "zone2Upper": 17443,
+      "zone2StartRate": 0.14,
+      "zone2EndRate": 0.2397,
+      "zone3Upper": 68480,
+      "zone3StartRate": 0.2397,
+      "zone3EndRate": 0.42,
+      "zone4Upper": 277825,
+      "zone4Rate": 0.42,
+      "zone5Rate": 0.45
+    }
+  }
+}

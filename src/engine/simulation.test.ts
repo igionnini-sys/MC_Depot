@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { createNormal, createRng, isPositiveSemiDefinite, nearestCorrelationMatrix, psdFactor } from './random';
-import { correlationSubmatrix, runSimulation } from './simulation';
+import { correlationSubmatrix, runSimulation, taxLimitFactor } from './simulation';
 import { conditionalVaR, mean, percentile, std, totalDeposited, valueAtRisk } from './stats';
 import { TaxEngine } from './taxEngine';
 import type { Asset, SimulationParams } from './types';
+import { DEFAULT_PARAMS, migrateState, STORAGE_KEY } from '../state/store';
+import { createTaxSession, TAX_REGIMES } from '../tax/registry';
 
 const stocks: Asset = { name: 'Stocks', allocation: 100, ter: 0, return: 7.5, volatility: 14.6, min_return: -37, max_return: 45 };
 
@@ -74,6 +76,49 @@ describe('simulation', () => {
     expect(r.final[0]).toBeCloseTo(1000 * 1.05 ** 10);
   });
 
+  it('deterministic retirement uses nominal returns without double-counting inflation', () => {
+    const flat: Asset = { ...stocks, volatility: 0, return: 10, ter: 0 };
+    const params: SimulationParams = {
+      ...base,
+      nSimulations: 1,
+      initialAmount: 10000,
+      annualContribution: 0,
+      yearsToRetirement: 2,
+      yearsRetired: 1,
+      inflation: 2,
+      useRealWithdrawal: true,
+      withdrawal: 1000,
+      capitalGainsTaxRate: 26,
+    };
+    const indep = runSimulation({ params, accumulationAssets: [flat], retirementAssets: [flat], correlation: null, seed: 1 });
+    const corr = runSimulation({
+      params,
+      accumulationAssets: [flat],
+      retirementAssets: [flat],
+      correlation: { enabled: true, assets: ['Stocks'], matrix: [[1]] },
+      seed: 1,
+    });
+    // Accumulation: 10,000 * 1.10^2 = 12,100 nominal; 12,100 / 1.02^2 = 11,630.14 real.
+    expect(indep.accumulationNominal[0]).toBeCloseTo(12100, 2);
+    expect(indep.accumulation[0]).toBeCloseTo(12100 / 1.02 ** 2, 2);
+    // Retirement year 0: 12,100 * 1.10 = 13,310 nominal; withdrawal = 1,000 * 1.02^2 = 1,040.40 -> final = 12,269.60.
+    expect(indep.final[0]).toBeCloseTo(13310 - 1040.4, 2);
+    // Real net withdrawal in today's purchasing power: 1,000 * (1 - 0.26 * (3,310 / 13,310)) = 935.34.
+    expect(indep.realWithdrawal[0]).toBeCloseTo(1000 * (1 - 0.26 * (3310 / 13310)), 2);
+    // Independent and correlated engines use identical nominal retirement math.
+    expect(corr.final[0]).toBeCloseTo(indep.final[0], 6);
+  });
+
+  it('indexes tax limits to inflation only when enabled', () => {
+    expect(taxLimitFactor({ inflation: 2.5 }, 10)).toBe(1);
+    expect(taxLimitFactor({ inflation: 2.5, indexTaxLimitsToInflation: false }, 10)).toBe(1);
+    expect(taxLimitFactor({ inflation: 2.5, indexTaxLimitsToInflation: true }, 0)).toBe(1);
+    expect(taxLimitFactor({ inflation: 2.5, indexTaxLimitsToInflation: true }, 10)).toBeCloseTo(1.025 ** 10, 8);
+    expect(
+      taxLimitFactor({ inflation: 2.5, indexTaxLimitsToInflation: true, taxLimitsInflationRate: 1.5 }, 10),
+    ).toBeCloseTo(1.015 ** 10, 8);
+  });
+
   it('is reproducible with a seed and gives a plausible success rate', () => {
     const req = { params: base, accumulationAssets: [stocks], retirementAssets: [stocks], correlation: null, seed: 42 };
     const a = runSimulation(req);
@@ -97,5 +142,58 @@ describe('simulation', () => {
     });
     expect(r.correlationUsed).toBe(true);
     expect(r.accumulation.length).toBe(500);
+  });
+
+  it('simplified tax regime via registry is bit-for-bit identical with fixed seed', () => {
+    const legacy = runSimulation({
+      params: { ...base, nSimulations: 200 },
+      accumulationAssets: [stocks],
+      retirementAssets: [stocks],
+      correlation: null,
+      seed: 42,
+    });
+    const simplified = runSimulation({
+      params: { ...DEFAULT_PARAMS, ...base, taxCountry: 'simplified', nSimulations: 200 },
+      accumulationAssets: [stocks],
+      retirementAssets: [stocks],
+      correlation: null,
+      seed: 42,
+    });
+    expect(Array.from(simplified.accumulationNominal)).toEqual(Array.from(legacy.accumulationNominal));
+    expect(Array.from(simplified.final)).toEqual(Array.from(legacy.final));
+    expect(Array.from(simplified.realWithdrawal)).toEqual(Array.from(legacy.realWithdrawal));
+    expect(simplified.taxAnalysis.totalTaxes.mean).toBe(legacy.taxAnalysis.totalTaxes.mean);
+  });
+
+  it('migrates v1 state to v2 and populates default tax settings', () => {
+    expect(STORAGE_KEY).toBe('finret.state.v2');
+    expect(TAX_REGIMES.find((r) => r.code === 'simplified')?.implemented).toBe(true);
+    const v1 = {
+      params: {
+        initialAmount: 5000,
+        yearsToRetirement: 30,
+        yearsRetired: 20,
+        annualContribution: 4000,
+        adjustContributionInflation: false,
+        inflation: 3.2,
+        useRealWithdrawal: true,
+        withdrawal: 15000,
+        capitalGainsTaxRate: 26,
+        nSimulations: 5000,
+      },
+    };
+    const migrated = migrateState(v1);
+    expect(migrated.params.initialAmount).toBe(5000);
+    expect(migrated.params.taxCountry).toBe('simplified');
+    expect(migrated.params.currentAge).toBe(30);
+    expect(migrated.params.startYear).toBe(2027);
+    expect(migrated.params.filingStatus).toBe('single');
+    expect(migrated.params.kirchensteuer).toBe('none');
+    expect(migrated.params.childrenCount).toBe(0);
+    expect(migrated.params.contributionSplitMode).toBe('auto');
+    expect(migrated.params.taxLimitsInflationRate).toBe(3.2);
+    const session = createTaxSession(migrated.params);
+    session.addInitialAmount(1000);
+    expect(session.portfolioValue).toBe(1000);
   });
 });

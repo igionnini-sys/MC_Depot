@@ -1,3 +1,5 @@
+import type { TaxSettings } from '../tax/types';
+
 /** Asset as used by the editor and the engine. All percentages are in % (7.5 = 7.5%). */
 export interface Asset {
   name: string;
@@ -9,7 +11,7 @@ export interface Asset {
   max_return: number;
 }
 
-export interface SimulationParams {
+export interface SimulationParams extends Partial<TaxSettings> {
   initialAmount: number;
   yearsToRetirement: number;
   yearsRetired: number;
@@ -69,9 +71,9 @@ export interface SimulationResults {
   accumulation: Float64Array;
   /** End-of-accumulation value, nominal. */
   accumulationNominal: Float64Array;
-  /** Portfolio value at the end of retirement (engine units, see PROGRESS.md). */
+  /** Portfolio value at the end of retirement, nominal. */
   final: Float64Array;
-  /** Average net (after-tax) withdrawal per simulation. */
+  /** Average net (after-tax) withdrawal per simulation (today's euros if useRealWithdrawal, else nominal). */
   realWithdrawal: Float64Array;
   taxAnalysis: TaxAnalysis;
   correlationUsed: boolean;

@@ -4,14 +4,16 @@ import { SCENARIO_KEYS, type ScenarioKey } from '../config';
 import type { SimulationParams } from '../engine/types';
 import { useI18n, type TranslationKey } from '../i18n';
 import type { Action, AppState } from '../state/store';
+import { TAX_REGIMES } from '../tax/registry';
+import type { ContributionSplitMode, CountryCode, FilingStatus, KirchensteuerRate } from '../tax/types';
 import { CorrelationDialog } from './CorrelationDialog';
-import { Alert, Card, NumberField, Select, Switch } from './ui';
+import { Alert, Card, Collapsible, NumberField, Select, Switch } from './ui';
 
 export function ParametersPanel({ state, dispatch }: { state: AppState; dispatch: (a: Action) => void }) {
   const { t } = useI18n();
   const p = state.params;
   const [showCorr, setShowCorr] = useState(false);
-  const set = (key: keyof SimulationParams) => (value: number | boolean) => dispatch({ type: 'param', key, value });
+  const set = (key: keyof SimulationParams) => (value: number | boolean | string) => dispatch({ type: 'param', key, value });
 
   return (
     <div className="stack">
@@ -21,6 +23,8 @@ export function ParametersPanel({ state, dispatch }: { state: AppState; dispatch
           <NumberField label={t('annual_contribution')} value={p.annualContribution} min={0} step={500} onChange={set('annualContribution')} />
           <NumberField label={t('years_to_retirement')} value={p.yearsToRetirement} min={0} max={99} step={1} onChange={(v) => set('yearsToRetirement')(Math.round(v))} />
           <NumberField label={t('years_retired')} value={p.yearsRetired} min={0} max={99} step={1} onChange={(v) => set('yearsRetired')(Math.round(v))} />
+          <NumberField label={t('current_age')} help={t('current_age_help')} value={p.currentAge ?? 30} min={18} max={90} step={1} onChange={(v) => set('currentAge')(Math.round(v))} />
+          <NumberField label={t('start_year')} help={t('start_year_help')} value={p.startYear ?? 2027} min={2020} max={2100} step={1} onChange={(v) => set('startYear')(Math.round(v))} />
           <NumberField label={t('inflation')} value={p.inflation} min={0} max={10} step={0.1} decimals={2} onChange={set('inflation')} />
         </div>
         <Switch
@@ -29,6 +33,109 @@ export function ParametersPanel({ state, dispatch }: { state: AppState; dispatch
           checked={p.adjustContributionInflation}
           onChange={set('adjustContributionInflation')}
         />
+      </Card>
+
+      <Card title={t('tax_section_title')}>
+        <Select<CountryCode>
+          label={t('tax_country')}
+          help={t('tax_country_help')}
+          value={p.taxCountry ?? 'simplified'}
+          options={TAX_REGIMES.map((r) => ({
+            value: r.code,
+            label: t(`tax_country_${r.code}` as TranslationKey),
+            disabled: !r.implemented,
+          }))}
+          onChange={set('taxCountry')}
+        />
+        <Switch
+          label={t('index_tax_limits')}
+          help={t('index_tax_limits_help')}
+          checked={!!p.indexTaxLimitsToInflation}
+          onChange={set('indexTaxLimitsToInflation')}
+        />
+        {p.indexTaxLimitsToInflation && (
+          <NumberField
+            label={t('tax_limits_inflation_rate')}
+            help={t('tax_limits_inflation_rate_help')}
+            value={p.taxLimitsInflationRate ?? p.inflation}
+            min={0}
+            max={15}
+            step={0.1}
+            decimals={2}
+            onChange={set('taxLimitsInflationRate')}
+          />
+        )}
+        <Collapsible title={t('personal_and_contribution_settings')}>
+          <div className="form-grid">
+            <Select<FilingStatus>
+              label={t('filing_status')}
+              value={p.filingStatus ?? 'single'}
+              options={[
+                { value: 'single', label: t('filing_status_single') },
+                { value: 'couple', label: t('filing_status_couple') },
+              ]}
+              onChange={set('filingStatus')}
+            />
+            <Select<KirchensteuerRate>
+              label={t('kirchensteuer')}
+              value={p.kirchensteuer ?? 'none'}
+              options={[
+                { value: 'none', label: t('kirchensteuer_none') },
+                { value: '8', label: t('kirchensteuer_8') },
+                { value: '9', label: t('kirchensteuer_9') },
+              ]}
+              onChange={set('kirchensteuer')}
+            />
+            <NumberField
+              label={t('children_count')}
+              help={t('children_count_help')}
+              value={p.childrenCount ?? 0}
+              min={0}
+              max={15}
+              step={1}
+              onChange={(v) => set('childrenCount')(Math.round(v))}
+            />
+            <NumberField
+              label={t('acc_marginal_tax_rate')}
+              help={t('acc_marginal_tax_rate_help')}
+              value={p.accumulationMarginalTaxRate ?? 35}
+              min={0}
+              max={60}
+              step={0.5}
+              decimals={1}
+              onChange={set('accumulationMarginalTaxRate')}
+            />
+            <NumberField
+              label={t('other_retirement_income')}
+              help={t('other_retirement_income_help')}
+              value={p.otherRetirementIncome ?? 0}
+              min={0}
+              step={500}
+              onChange={set('otherRetirementIncome')}
+            />
+            <Select<ContributionSplitMode>
+              label={t('contribution_split_mode')}
+              help={t('contribution_split_mode_help')}
+              value={p.contributionSplitMode ?? 'auto'}
+              options={[
+                { value: 'auto', label: t('contribution_split_auto') },
+                { value: 'manual', label: t('contribution_split_manual') },
+              ]}
+              onChange={set('contributionSplitMode')}
+            />
+            {p.contributionSplitMode === 'manual' && (
+              <NumberField
+                label={t('manual_avd_contribution')}
+                help={t('manual_avd_contribution_help')}
+                value={p.manualAvdContribution ?? 1800}
+                min={0}
+                max={p.annualContribution}
+                step={100}
+                onChange={set('manualAvdContribution')}
+              />
+            )}
+          </div>
+        </Collapsible>
       </Card>
 
       <Card title={t('withdrawal_section_title')}>

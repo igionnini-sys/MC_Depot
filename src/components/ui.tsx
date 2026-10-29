@@ -107,21 +107,40 @@ export function Switch({ label, checked, onChange, help }: { label: string; chec
   );
 }
 
-export function Select<T extends string | number>({ label, value, options, onChange }: { label?: string; value: T; options: { value: T; label: string }[]; onChange: (v: T) => void }) {
+export function Select<T extends string | number>({
+  label,
+  help,
+  value,
+  options,
+  onChange,
+}: {
+  label?: string;
+  help?: string;
+  value: T;
+  options: { value: T; label: string; disabled?: boolean }[];
+  onChange: (v: T) => void;
+}) {
   const id = useId();
   return (
     <div className="field">
-      {label && <label htmlFor={id}>{label}</label>}
+      {label && (
+        <label htmlFor={id}>
+          {label}
+          {help && <Help text={help} />}
+        </label>
+      )}
       <select
         id={id}
         value={String(value)}
         onChange={(e) => {
           const opt = options.find((o) => String(o.value) === e.target.value);
-          if (opt) onChange(opt.value);
+          if (opt && !opt.disabled) onChange(opt.value);
         }}
       >
         {options.map((o) => (
-          <option key={String(o.value)} value={String(o.value)}>{o.label}</option>
+          <option key={String(o.value)} value={String(o.value)} disabled={o.disabled}>
+            {o.label}
+          </option>
         ))}
       </select>
     </div>

@@ -1,12 +1,27 @@
 /**
  * Monte Carlo engine: port of simulation_engine.py (independent assets) and
- * correlation_engine.py (correlated assets). Semantics are kept identical to the
- * Streamlit app, including the retirement-phase conventions documented in PROGRESS.md.
+ * correlation_engine.py (correlated assets).
+ * All internal portfolio values, returns, contributions and withdrawals are computed
+ * in nominal euros; deflation to today's purchasing power happens at the boundaries.
  */
 import { createNormal, createRng, isPositiveSemiDefinite, nearestCorrelationMatrix, psdFactor } from './random';
 import { mean, max, min, percentile, std } from './stats';
-import { TaxEngine } from './taxEngine';
-import type { Asset, SimulationRequest, SimulationResults, SummaryStats, TaxAnalysis, TaxDetails } from './types';
+import { computePortfolioTaxProfile, type PortfolioTaxProfile } from '../tax/de';
+import { createTaxSession } from '../tax/registry';
+import type { Asset, SimulationParams, SimulationRequest, SimulationResults, SummaryStats, TaxAnalysis, TaxDetails } from './types';
+
+/**
+ * Multiplier for fixed statutory tax limits (allowances, caps, brackets) at `yearFromStart` (0 = first year).
+ * Returns 1 when `indexTaxLimitsToInflation` is false/omitted; otherwise compounds by `taxLimitsInflationRate ?? inflation`.
+ */
+export function taxLimitFactor(
+  p: Pick<SimulationParams, 'inflation' | 'indexTaxLimitsToInflation' | 'taxLimitsInflationRate'>,
+  yearFromStart: number,
+): number {
+  if (!p.indexTaxLimitsToInflation || yearFromStart <= 0) return 1;
+  const rate = (p.taxLimitsInflationRate ?? p.inflation) / 100;
+  return (1 + rate) ** yearFromStart;
+}
 
 interface PhaseData {
   mean: number[];
@@ -77,6 +92,8 @@ export function runSimulation(req: SimulationRequest, onProgress?: ProgressFn): 
   const retCorr = useCorr ? correlationSubmatrix(correlation!.assets, correlation!.matrix, retirementAssets.map((a) => a.name)) : null;
   const acc = phaseData(accumulationAssets, accCorr);
   const ret = phaseData(retirementAssets, retCorr);
+  const accTaxProfile = computePortfolioTaxProfile(accumulationAssets);
+  const retTaxProfile = computePortfolioTaxProfile(retirementAssets);
 
   const normal = createNormal(createRng(req.seed));
   const n = p.nSimulations;
@@ -93,7 +110,7 @@ export function runSimulation(req: SimulationRequest, onProgress?: ProgressFn): 
   const step = Math.max(1, Math.floor(n / 100));
   for (let s = 0; s < n; s++) {
     if (onProgress && s % step === 0) onProgress(s, n);
-    const r = simulateOne(p, acc, ret, normal, useCorr);
+    const r = simulateOne(p, acc, ret, normal, accTaxProfile, retTaxProfile);
     out.accumulation[s] = r.accumulationReal;
     out.accumulationNominal[s] = r.accumulationNominal;
     out.final[s] = r.final;
@@ -145,22 +162,22 @@ function simulateOne(
   acc: PhaseData,
   ret: PhaseData,
   normal: () => number,
-  correlated: boolean,
+  accTaxProfile: PortfolioTaxProfile,
+  retTaxProfile: PortfolioTaxProfile,
 ): SingleResult {
   const inflation = p.inflation / 100;
   const yearsAcc = Math.trunc(p.yearsToRetirement);
   const yearsRet = Math.trunc(p.yearsRetired);
-  const tax = new TaxEngine(p.capitalGainsTaxRate, yearsAcc + 2);
+  const tax = createTaxSession(p, accTaxProfile, retTaxProfile);
   const zA = new Array<number>(acc.mean.length), cA = new Array<number>(acc.mean.length);
   const zR = new Array<number>(ret.mean.length), cR = new Array<number>(ret.mean.length);
 
-  if (p.initialAmount > 0) tax.addContribution(p.initialAmount);
+  if (p.initialAmount > 0) tax.addInitialAmount(p.initialAmount);
   let contribution = p.annualContribution;
 
-  // Accumulation: returns are applied first, then the end-of-year contribution.
+  // Accumulation: returns → annual taxes → end-of-year contribution.
   for (let y = 0; y < yearsAcc; y++) {
-    tax.applyReturns(yearReturn(acc, normal, zA, cA));
-    if (contribution > 0) tax.addContribution(contribution);
+    tax.onAccumulationYear(yearReturn(acc, normal, zA, cA), contribution, y);
     if (p.adjustContributionInflation) contribution *= 1 + inflation;
   }
 
@@ -172,18 +189,13 @@ function simulateOne(
   let taxSum = 0;
   for (let y = 0; y < yearsRet; y++) {
     const nominal = yearReturn(ret, normal, zR, cR);
-    // simulation_engine.py subtracts inflation; correlation_engine.py uses the exact Fisher form.
-    const real = correlated ? (1 + nominal) / (1 + inflation) - 1 : nominal - inflation;
-    tax.applyReturns(real);
-
-    const value = tax.portfolioValue;
+    const value = tax.applyRetirementReturn(nominal, y);
     if (value <= 0) break;
 
-    const amount = p.useRealWithdrawal
-      ? p.withdrawal * (1 + inflation) ** (p.yearsToRetirement + y)
-      : p.withdrawal;
-    const w = tax.withdraw(Math.min(amount, value));
-    totalNet += w.netWithdrawal;
+    const deflator = (1 + inflation) ** (p.yearsToRetirement + y);
+    const amount = p.useRealWithdrawal ? p.withdrawal * deflator : p.withdrawal;
+    const w = tax.withdraw(amount, y);
+    totalNet += p.useRealWithdrawal ? w.netWithdrawal / deflator : w.netWithdrawal;
     taxSum += w.taxesOwed;
     withdrawals++;
     if (tax.portfolioValue <= 0) break;
