@@ -5,7 +5,9 @@ export interface Asset {
   name: string;
   allocation: number;
   ter: number;
+  /** Arithmetic mean annual nominal return before TER and tax; not CAGR. */
   return: number;
+  /** Target standard deviation of the annual returns after clipping, before TER. */
   volatility: number;
   min_return: number;
   max_return: number;
@@ -50,6 +52,12 @@ export interface TaxDetails {
   averageAnnualTax: number;
   totalYearsWithWithdrawals: number;
   finalWithdrawal: number;
+  brokerageFinalValue?: number;
+  pensionFinalValue?: number;
+  brokerageTaxesPaid?: number;
+  pensionTaxesPaid?: number;
+  stateSubsidiesReceived?: number;
+  extraTaxRefundsReceived?: number;
 }
 
 export interface SummaryStats {
@@ -60,10 +68,22 @@ export interface SummaryStats {
   std: number;
 }
 
+export interface ContainerTaxBreakdown {
+  brokerageFinalMean: number;
+  brokerageFinalMedian: number;
+  pensionFinalMean: number;
+  pensionFinalMedian: number;
+  brokerageTaxesMean: number;
+  pensionTaxesMean: number;
+  stateSubsidiesMean: number;
+  extraTaxRefundsMean: number;
+}
+
 export interface TaxAnalysis {
   totalTaxes: SummaryStats;
   effectiveTaxRate: SummaryStats;
   avgFinalWithdrawal: number;
+  containers?: ContainerTaxBreakdown;
 }
 
 export interface SimulationResults {

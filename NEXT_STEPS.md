@@ -1,6 +1,6 @@
 # Prossimi passi — da dove riprendere
 
-Ultimo aggiornamento: **2026-10-29**. Stato: Fase 1 completata; **Passi 0, 1, 2 e 3 della Fase 4 completati**. Prossimo passo: **Passo 4** (Interfaccia e risultati fiscali per paese/contenitore).
+Ultimo aggiornamento: **2026-10-29**. Stato: **Fasi 1, 2 (punti 1–3) e 4 (Passi 0–7) completate** (Germania, Italia e Paesi Bassi completi in motore, UI, test e documentazione).
 
 Documenti: [PROGRESS.md](PROGRESS.md) · [docs/piano-fiscalita-multipaese.md](docs/piano-fiscalita-multipaese.md) · [docs/prompt-fiscalita-multipaese.md](docs/prompt-fiscalita-multipaese.md)
 
@@ -21,7 +21,10 @@ Documenti: [PROGRESS.md](PROGRESS.md) · [docs/piano-fiscalita-multipaese.md](do
 3. [x] **Passo 1** — struttura `src/tax/`, regime `simplified` identico all'attuale, selettore paese, nuovi input (decisione 4) e modalità versamento (decisione 3), stato salvato v2 con migrazione.
 4. [x] **Passo 2** — Germania: deposito ordinario (`src/tax/params/de.json`, `src/tax/grossUp.ts`, `src/tax/de/brokerage.ts`, 20/20 test verdi).
 5. [x] **Passo 3** — Germania: Altersvorsorgedepot 2027 (`src/tax/common/progressive.ts`, `src/tax/de/guenstigerpruefung.ts`, `src/tax/de/altersvorsorgedepot.ts`, 25/25 test verdi).
-6. **Passo 4** *(prossimo)* — Interfaccia e risultati (`ParametersPanel.tsx`, `ResultsView.tsx`, `translations.ts`, dettaglio per contenitore AVD vs Deposito ordinario, Zulage e avviso `verified: false`), poi Italia (Passo 5), Paesi Bassi (Passo 6), chiusura (Passo 7).
+6. [x] **Passo 4** — Interfaccia e risultati (`ParametersPanel.tsx`, `ResultsView.tsx`, `translations.ts`, dettaglio per contenitore AVD vs Deposito ordinario, Zulage e avviso `verified: false`).
+7. [x] **Passo 5** — Italia (`src/tax/params/it.json`, `src/tax/it/index.ts`, `src/tax/it/it.test.ts`, 29/29 test verdi).
+8. [x] **Passo 6** — Paesi Bassi (`src/tax/params/nl.json`, `src/tax/nl/index.ts`, `src/tax/nl/nl.test.ts`, 34/34 test verdi).
+9. [x] **Passo 7** — Chiusura: disclaimer fiscali multi-paese nella sezione Informazioni/Disclaimer, aggiornamento di `README.md`, `PROGRESS.md` e `NEXT_STEPS.md`.
 
 ## Ancora aperto
 

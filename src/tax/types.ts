@@ -44,6 +44,14 @@ export interface TaxSession {
   readonly totalTaxesPaid: number;
   readonly totalCapitalGainsRealized: number;
 
+  /** Optional per-container breakdown for multi-container regimes (e.g. Germany, Italy). */
+  readonly brokerageFinalValue?: number;
+  readonly pensionFinalValue?: number;
+  readonly brokerageTaxesPaid?: number;
+  readonly pensionTaxesPaid?: number;
+  readonly stateSubsidiesReceived?: number;
+  readonly extraTaxRefundsReceived?: number;
+
   addInitialAmount(amount: number): void;
   /**
    * Executes one accumulation year in canonical order:

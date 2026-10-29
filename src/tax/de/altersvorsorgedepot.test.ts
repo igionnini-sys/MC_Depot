@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest';
+import { runSimulation } from '../../engine/simulation';
+import type { Asset } from '../../engine/types';
 import { DEFAULT_PARAMS } from '../../state/store';
 import { computeGermanIncomeTax, computeIncrementalGermanIncomeTax } from '../common/progressive';
 import { AltersvorsorgedepotContainer, splitAnnualContribution } from './altersvorsorgedepot';
@@ -132,6 +134,35 @@ describe('Germany Altersvorsorgedepot 2027 — Step 3 acceptance tests', () => {
     const w = session.withdraw(5000, 0);
     expect(w.netWithdrawal).toBeCloseTo(5000, 1);
     expect(w.grossWithdrawal).toBeGreaterThan(5000);
+
+    // Full runSimulation populates container breakdown for ResultsView (Step 4)
+    const stocks: Asset = {
+      name: 'Stocks',
+      allocation: 100,
+      ter: 0.2,
+      return: 7,
+      volatility: 14,
+      min_return: -35,
+      max_return: 40,
+    };
+    const res = runSimulation({
+      params: {
+        ...DEFAULT_PARAMS,
+        taxCountry: 'de',
+        nSimulations: 50,
+        annualContribution: 10000,
+        childrenCount: 1,
+        accumulationMarginalTaxRate: 38,
+      },
+      accumulationAssets: [stocks],
+      retirementAssets: [stocks],
+      correlation: null,
+      seed: 99,
+    });
+    expect(res.taxAnalysis.containers).toBeDefined();
+    expect(res.taxAnalysis.containers!.stateSubsidiesMean).toBeGreaterThan(0);
+    expect(res.taxAnalysis.containers!.extraTaxRefundsMean).toBeGreaterThan(0);
+    expect(res.taxAnalysis.containers!.pensionFinalMean + res.taxAnalysis.containers!.brokerageFinalMean).toBeGreaterThan(0);
   });
 });
 

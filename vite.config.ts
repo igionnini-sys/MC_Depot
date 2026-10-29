@@ -7,5 +7,6 @@ export default defineConfig({
   plugins: [react()],
   worker: { format: 'es' },
   build: { target: 'es2020', chunkSizeWarningLimit: 1500 },
-  test: { environment: 'node' },
+  // The suite includes a wall-clock performance budget; concurrent files contend for CPU.
+  test: { environment: 'node', fileParallelism: false },
 } as any);

@@ -1,0 +1,8 @@
+{
+  "Stocks": { "return": 7.0, "volatility": 16.0, "min_return": -45, "max_return": 50 },
+  "Bond": { "return": 3.2, "volatility": 6.3, "min_return": -20, "max_return": 20 },
+  "Gold": { "return": 5.0, "volatility": 16.0, "min_return": -40, "max_return": 65 },
+  "REIT": { "return": 4.5, "volatility": 23.0, "min_return": -55, "max_return": 55 },
+  "Commodities": { "return": 2.5, "volatility": 24.0, "min_return": -50, "max_return": 60 },
+  "Cash": { "return": 1.5, "volatility": 1.5, "min_return": -1, "max_return": 6 }
+}

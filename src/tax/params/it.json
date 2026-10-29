@@ -1,0 +1,37 @@
+{
+  "country": "it",
+  "description": "Italian tax parameters: ordinary brokerage (26% capital gains + 0.20% annual stamp duty) and supplementary pension fund (D.Lgs. 252/2005).",
+  "brokerage": {
+    "capitalGainsTaxRate": {
+      "value": 0.26,
+      "source": "Art. 3 D.L. 24 aprile 2014, n. 66 (imposta sostitutiva sulle rendite finanziarie)",
+      "verified": true
+    },
+    "governmentBondTaxRate": {
+      "value": 0.125,
+      "source": "Art. 3, comma 2, D.L. 66/2014 (titoli di Stato ed equiparati white-list)",
+      "verified": true
+    },
+    "stampDutyRate": {
+      "value": 0.002,
+      "source": "Art. 13, comma 2-ter, Tariffa Parte I, D.P.R. 642/1972 (imposta di bollo 0,20% annuo sui prodotti finanziari)",
+      "verified": true
+    }
+  },
+  "pensionFund": {
+    "deductibilityCap": {
+      "value": 5164.57,
+      "source": "Art. 8, comma 4, D.Lgs. 5 dicembre 2005, n. 252",
+      "verified": true
+    },
+    "payoutTax": {
+      "baseRate": 0.15,
+      "minRate": 0.09,
+      "reductionPerYearAfter15": 0.003,
+      "thresholdYears": 15,
+      "source": "Art. 11, comma 6, D.Lgs. 252/2005 (15% ridotta di 0,30% per ogni anno oltre il 15° fino al 9%)",
+      "verified": true
+    }
+  }
+}
+

@@ -1,0 +1,38 @@
+{
+  "Stocks": {
+    "return": 13.209914,
+    "volatility": 17.43651,
+    "min_return": -32.884426,
+    "max_return": 39.189067
+  },
+  "Bond": {
+    "return": 4.675149,
+    "volatility": 12.726308,
+    "min_return": -14.13696,
+    "max_return": 27.038306
+  },
+  "Gold": {
+    "return": 11.94931,
+    "volatility": 15.311458,
+    "min_return": -30.743698,
+    "max_return": 39.337782
+  },
+  "REIT": {
+    "return": 10.958002,
+    "volatility": 23.092946,
+    "min_return": -34.130095,
+    "max_return": 53.087789
+  },
+  "Commodities": {
+    "return": 2.577187,
+    "volatility": 25.32597,
+    "min_return": -43.39867,
+    "max_return": 52.06029
+  },
+  "Cash": {
+    "return": 1.004457,
+    "volatility": 1.663921,
+    "min_return": -0.488407,
+    "max_return": 3.998504
+  }
+}

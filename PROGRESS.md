@@ -71,7 +71,7 @@ Anomalie del modello originale corrette nel Passo 0:
 - [ ] Android: wrapper **Capacitor** (APK/AAB) oppure TWA (Trusted Web Activity) partendo dalla PWA
 - [ ] Hosting statico della PWA (GitHub Pages / Netlify) per installazione diretta da browser
 
-### Fase 4 — Fiscalità multi-paese (Germania → Italia → Paesi Bassi) 🚧 (in corso)
+### Fase 4 — Fiscalità multi-paese (Germania → Italia → Paesi Bassi) ✅ (completata)
 
 Piano: [docs/piano-fiscalita-multipaese.md](docs/piano-fiscalita-multipaese.md) · Prompt AI: [docs/prompt-fiscalita-multipaese.md](docs/prompt-fiscalita-multipaese.md)
 
@@ -81,8 +81,10 @@ Piano: [docs/piano-fiscalita-multipaese.md](docs/piano-fiscalita-multipaese.md) 
 - [x] Passo 1 — Struttura `src/tax/`, regime `simplified` identico all'attuale, selettore paese, nuovi input personali e di ripartizione versamenti, stato salvato `finret.state.v2` con migrazione da `v1`
 - [x] Passo 2 — Germania: deposito ordinario (Abgeltungsteuer, Soli/KiSt, Sparer-Pauschbetrag, Teilfreistellung, Vorabpauschale, gross-up)
 - [x] Passo 3 — Germania: Altersvorsorgedepot 2027 (Zulage, Günstigerprüfung, decumulo con tariffa progressiva)
-- [ ] Passo 4 — Interfaccia e risultati fiscali per paese/contenitore
-- [ ] Passo 5 — Italia · [ ] Passo 6 — Paesi Bassi · [ ] Passo 7 — Chiusura e disclaimer
+- [x] Passo 4 — Interfaccia e risultati fiscali per paese/contenitore (confronto AVD vs Deposito ordinario, Zulagen, Günstigerprüfung, avviso `verified: false`, traduzioni IT/EN)
+- [x] Passo 5 — Italia (`src/tax/params/it.json`, `src/tax/it/index.ts`, imposta sostitutiva 26%, bollo 0,20% annuo, fondo pensione con deducibilità fino a 5.164,57 € e decumulo agevolato 15% → 9%)
+- [x] Passo 6 — Paesi Bassi (`src/tax/params/nl.json`, `src/tax/nl/index.ts`, Box 3: tassazione annuale sul rendimento forfettario differenziato tra liquidità e investimenti, franchigia singolo/coppia, prelievi esenti in pensione)
+- [x] Passo 7 — Chiusura: disclaimer fiscali multi-paese in UI (`App.tsx` / `translations.ts`), documentazione aggiornata (`README.md`, `PROGRESS.md`, `NEXT_STEPS.md`)
 
 Attenzione: i parametri dell'Altersvorsorgedepot 2027 provengono dalle note dell'utente e vanno **verificati sul testo di legge definitivo** (`verified: false` finché non confermati).
 
@@ -125,9 +127,10 @@ FinRet/
 ├── scripts/gen-icons.mjs  generatore icone PNG
 ├── src/
 │   ├── config/            profili e scenari (enhanced_config.json)
-│   ├── engine/            motore Monte Carlo, tasse, statistiche, worker, test
+│   ├── engine/            motore Monte Carlo, tasse base, statistiche, worker, test
+│   ├── tax/               architettura fiscale plug-in (de, it, nl, params/*.json, grossUp, progressive)
 │   ├── i18n/              traduzioni IT/EN
-│   ├── state/             stato app + hook simulazione
+│   ├── state/             stato app (v2 con migrazione) + hook simulazione
 │   ├── components/        pannelli, grafici, primitive UI
 │   ├── App.tsx            shell dell'app
 │   └── styles.css         design token chiaro/scuro e layout
@@ -142,3 +145,7 @@ FinRet/
 - **2026-10-29** — Fase 4, Passo 1 completato: struttura plug-in `src/tax/` (`types.ts`, `registry.ts`, stub `de`, `it`, `nl`), regime `simplified` bit-a-bit identico a parità di seme, nuovi input in UI (`ParametersPanel.tsx`) e traduzioni IT/EN, persistenza `finret.state.v2` con migrazione da `v1`, 14/14 test verdi e build pulita.
 - **2026-10-29** — Fase 4, Passo 2 completato: deposito ordinario Germania (`src/tax/params/de.json`, `src/tax/grossUp.ts`, `src/tax/de/brokerage.ts`, `src/tax/de/brokerage.test.ts`), Abgeltungsteuer + Soli + Kirchensteuer, Sparer-Pauschbetrag, Teilfreistellung ponderata ed esenzione ETC (Gold/Commodities) da Vorabpauschale, tracciamento cumulativo Vorabpauschale lorda e deduzione alla vendita, compensazione perdite, gross-up (proporzionale e FIFO), 20/20 test verdi (< 420 ms per 10.000 simulazioni).
 - **2026-10-29** — Fase 4, Passo 3 completato: Germania Altersvorsorgedepot 2027 (`src/tax/common/progressive.ts`, `src/tax/de/guenstigerpruefung.ts`, `src/tax/de/altersvorsorgedepot.ts`, `src/tax/de/altersvorsorgedepot.test.ts`), accumulo esente da tasse con Zulage (50% fino a 360 € + 25% fino a 1.800 € + 300 € per figlio) e Günstigerprüfung, ripartizione automatica/manuale con tetto 6.840 €, decumulo con età minima 65, quota forfettaria ≤ 30% e tariffa progressiva § 32a EStG con inversione analitica $O(1)$ (`grossUpGermanIncomeTax`), 25/25 test verdi (~313 ms per 10.000 simulazioni con entrambi i contenitori attivi).
+- **2026-10-29** — Fase 4, Passo 4 completato: interfaccia e risultati fiscali per paese/contenitore (`ParametersPanel.tsx`, `ResultsView.tsx`, `src/engine/types.ts`, `src/engine/simulation.ts`, `translations.ts`), tabella di confronto AVD vs Deposito ordinario (tasse medie, valore finale mediano e medio), riepilogo Zulagen e rimborsi extra Günstigerprüfung, avviso `verified: false` per i parametri 2027 in bozza, spiegazione fiscale dettagliata IT/EN ed esclusioni dichiarate.
+- **2026-10-29** — Fase 4, Passo 5 completato: modulo fiscale Italia (`src/tax/params/it.json`, `src/tax/it/index.ts`, `src/tax/it/it.test.ts`), conto titoli ordinario (26% capital gain + bollo 0,20% annuo) e fondo pensione complementare D.Lgs. 252/2005 (deducibilità fino a 5.164,57 €/anno e tassazione agevolato decumulo 15% → 9%), attivato in UI e nei risultati (29/29 test verdi).
+- **2026-10-29** — Fase 4, Passo 6 completato: modulo fiscale Paesi Bassi Box 3 (`src/tax/params/nl.json`, `src/tax/nl/index.ts`, `src/tax/nl/nl.test.ts`), tassazione annuale sul rendimento presunto differenziato per categoria di asset (`Cash` vs altri investimenti), franchigia `heffingsvrij vermogen` singolo/coppia indicizzabile, prelievi in pensione esenti da capital gain alla vendita, banner `verified: false` per la normativa Box 3 in evoluzione (34/34 test verdi).
+- **2026-10-29** — Fase 4, Passo 7 completato (Fase 4 conclusa): aggiunti disclaimer fiscali multi-paese nella sezione Informazioni/Disclaimer (`App.tsx`, `translations.ts`), aggiornati `README.md`, `PROGRESS.md` e `NEXT_STEPS.md`.

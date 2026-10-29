@@ -1,6 +1,6 @@
 /** App state (replaces st.session_state + PortfolioManager), persisted in localStorage. */
 import { useEffect, useReducer } from 'react';
-import { DEFAULT_ACCUMULATION_PROFILE, DEFAULT_RETIREMENT_PROFILE, getProfileData, type ScenarioKey } from '../config';
+import { DEFAULT_ACCUMULATION_PROFILE, DEFAULT_RETIREMENT_PROFILE, getProfileData, migrateAssetDefaults, type ScenarioKey } from '../config';
 import type { Asset, SimulationParams } from '../engine/types';
 import type { Lang } from '../i18n';
 
@@ -68,7 +68,7 @@ export function initialState(): AppState {
     useSamePortfolio: true,
     selectedProfile: { accumulation: DEFAULT_ACCUMULATION_PROFILE, retirement: DEFAULT_RETIREMENT_PROFILE },
     assets: { accumulation: acc, retirement: acc.map((a) => ({ ...a })) },
-    correlation: { enabled: false, scenario: 'normal_times' },
+    correlation: { enabled: true, scenario: 'normal_times' },
   };
 }
 
@@ -84,7 +84,10 @@ export function migrateState(saved: Partial<AppState> | null | undefined, base: 
     ...saved,
     params: mergedParams,
     selectedProfile: { ...base.selectedProfile, ...saved.selectedProfile },
-    assets: saved.assets?.accumulation?.length ? saved.assets : base.assets,
+    assets: saved.assets?.accumulation?.length ? {
+      accumulation: migrateAssetDefaults(saved.assets.accumulation),
+      retirement: saved.assets.retirement?.length ? migrateAssetDefaults(saved.assets.retirement) : base.assets.retirement,
+    } : base.assets,
     correlation: { ...base.correlation, ...saved.correlation },
   };
 }

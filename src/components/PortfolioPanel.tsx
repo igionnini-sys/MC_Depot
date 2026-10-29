@@ -73,6 +73,7 @@ function PhaseEditor({ phase, state, dispatch }: { phase: Phase; state: AppState
           </Alert>
         </div>
 
+        <p className="muted">{t('historical_calibration_note')}</p>
         <ul className="asset-list">
           {assets.map((a, i) => (
             <AssetRow key={a.name} asset={a} onChange={(patch) => dispatch({ type: 'updateAsset', phase, index: i, patch })} />

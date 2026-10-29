@@ -47,6 +47,11 @@ export function ParametersPanel({ state, dispatch }: { state: AppState; dispatch
           }))}
           onChange={set('taxCountry')}
         />
+        {(p.taxCountry === 'de' || p.taxCountry === 'nl') && (
+          <Alert tone="warning" title={t('tax_unverified_warning_title')}>
+            {p.taxCountry === 'de' ? t('tax_unverified_warning_de') : t('tax_unverified_warning_nl')}
+          </Alert>
+        )}
         <Switch
           label={t('index_tax_limits')}
           help={t('index_tax_limits_help')}
@@ -65,7 +70,7 @@ export function ParametersPanel({ state, dispatch }: { state: AppState; dispatch
             onChange={set('taxLimitsInflationRate')}
           />
         )}
-        <Collapsible title={t('personal_and_contribution_settings')}>
+        <Collapsible key={p.taxCountry ?? 'simplified'} title={t('personal_and_contribution_settings')} defaultOpen={p.taxCountry === 'de'}>
           <div className="form-grid">
             <Select<FilingStatus>
               label={t('filing_status')}
@@ -152,16 +157,18 @@ export function ParametersPanel({ state, dispatch }: { state: AppState; dispatch
           {p.useRealWithdrawal ? t('real_withdrawal_explanation') : t('nominal_withdrawal_explanation')}
         </Alert>
         <div className="form-grid">
-          <NumberField
-            label={t('capital_gains_tax_rate')}
-            help={t('capital_gains_tax_help')}
-            value={p.capitalGainsTaxRate}
-            min={0}
-            max={100}
-            step={0.1}
-            decimals={1}
-            onChange={set('capitalGainsTaxRate')}
-          />
+          {(p.taxCountry ?? 'simplified') === 'simplified' && (
+            <NumberField
+              label={t('capital_gains_tax_rate')}
+              help={t('capital_gains_tax_help')}
+              value={p.capitalGainsTaxRate}
+              min={0}
+              max={100}
+              step={0.1}
+              decimals={1}
+              onChange={set('capitalGainsTaxRate')}
+            />
+          )}
           <Select
             label={t('n_simulations')}
             value={p.nSimulations}

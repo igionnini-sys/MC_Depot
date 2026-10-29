@@ -1,84 +1,91 @@
 {
   "asset_characteristics": {
     "Stocks": {
-      "return": 7.5,
-      "volatility": 14.6,
-      "min_return": -37.0,
-      "max_return": 45.0
+      "return": 7,
+      "volatility": 16,
+      "min_return": -45,
+      "max_return": 50
     },
     "Bond": {
       "return": 3.2,
-      "volatility": 4.8,
-      "min_return": -15.0,
-      "max_return": 12.0
+      "volatility": 6.3,
+      "min_return": -20,
+      "max_return": 20
     },
     "Gold": {
-      "return": 6.5,
-      "volatility": 14.9, 
-      "min_return": -30.9,
-      "max_return": 37.7
+      "return": 5,
+      "volatility": 16,
+      "min_return": -40,
+      "max_return": 65
     },
     "REIT": {
-      "return": 4.3,
-      "volatility": 18.0,
-      "min_return": -37.2,
-      "max_return": 28.1
+      "return": 4.5,
+      "volatility": 23,
+      "min_return": -55,
+      "max_return": 55
     },
     "Commodities": {
-      "return": 2.1,
-      "volatility": 22.0,
-      "min_return": -45.0,
-      "max_return": 40.0
+      "return": 2.5,
+      "volatility": 24,
+      "min_return": -50,
+      "max_return": 60
     },
     "Cash": {
-      "return": 1.0,
-      "volatility": 0.8,
-      "min_return": 0.0,
-      "max_return": 4.5
+      "return": 1.5,
+      "volatility": 1.5,
+      "min_return": -1,
+      "max_return": 6
     },
     "UserAsset1": {
-      "return": 0.0,
-      "volatility": 0.0,
-      "min_return": 0.0,
-      "max_return": 0.0
+      "return": 0,
+      "volatility": 0,
+      "min_return": 0,
+      "max_return": 0
     },
     "UserAsset2": {
-      "return": 0.0,
-      "volatility": 0.0,
-      "min_return": 0.0,
-      "max_return": 0.0
+      "return": 0,
+      "volatility": 0,
+      "min_return": 0,
+      "max_return": 0
     }
   },
-  
   "correlation_matrix": {
-    "assets": ["Stocks", "Bond", "Gold", "REIT", "Commodities", "Cash", "UserAsset1", "UserAsset2"],
-    "description": "Default correlation matrix based on historical relationships",
+    "assets": [
+      "Stocks",
+      "Bond",
+      "Gold",
+      "REIT",
+      "Commodities",
+      "Cash",
+      "UserAsset1",
+      "UserAsset2"
+    ],
+    "description": "Pearson correlations of annual nominal EUR returns, 2008–2024. REIT series joins gross and net index returns. Custom assets use zero placeholders.",
     "matrix": [
-      [1.00, -0.10, 0.10, 0.70, 0.30, 0.00, 0.20, 0.20],
-      [-0.10, 1.00, 0.20, 0.10, 0.10, 0.30, 0.15, 0.15],
-      [0.10, 0.20, 1.00, 0.20, 0.40, 0.10, 0.20, 0.20],
-      [0.70, 0.10, 0.20, 1.00, 0.30, 0.00, 0.25, 0.25],
-      [0.30, 0.10, 0.40, 0.30, 1.00, 0.00, 0.20, 0.20],
-      [0.00, 0.30, 0.10, 0.00, 0.00, 1.00, 0.10, 0.10],
-      [0.20, 0.15, 0.20, 0.25, 0.20, 0.10, 1.00, 0.50],
-      [0.20, 0.15, 0.20, 0.25, 0.20, 0.10, 0.50, 1.00]
+      [1, 0.26332, 0.140877, 0.853941, 0.477738, -0.25538, 0, 0],
+      [0.26332, 1, 0.143133, 0.490706, -0.495899, 0.231678, 0, 0],
+      [0.140877, 0.143133, 1, 0.026315, 0.222308, 0.298169, 0, 0],
+      [0.853941, 0.490706, 0.026315, 1, 0.196468, -0.340392, 0, 0],
+      [0.477738, -0.495899, 0.222308, 0.196468, 1, -0.252074, 0, 0],
+      [-0.25538, 0.231678, 0.298169, -0.340392, -0.252074, 1, 0, 0],
+      [0, 0, 0, 0, 0, 0, 1, 0],
+      [0, 0, 0, 0, 0, 0, 0, 1]
     ]
   },
-  
   "correlation_scenarios": {
     "normal_times": {
-      "description": "Normal market conditions with typical asset correlations",
+      "description": "Pearson correlations of annual nominal EUR returns, 2008–2024. REIT series joins gross and net index returns. Custom assets use zero placeholders.",
       "market_regime": "normal",
       "stress_level": "low",
       "matrix": [
-        [1.00, -0.10, 0.10, 0.70, 0.30, 0.00, 0.20, 0.20],
-        [-0.10, 1.00, 0.20, 0.10, 0.10, 0.30, 0.15, 0.15],
-        [0.10, 0.20, 1.00, 0.20, 0.40, 0.10, 0.20, 0.20],
-        [0.70, 0.10, 0.20, 1.00, 0.30, 0.00, 0.25, 0.25],
-        [0.30, 0.10, 0.40, 0.30, 1.00, 0.00, 0.20, 0.20],
-        [0.00, 0.30, 0.10, 0.00, 0.00, 1.00, 0.10, 0.10],
-        [0.20, 0.15, 0.20, 0.25, 0.20, 0.10, 1.00, 0.50],
-        [0.20, 0.15, 0.20, 0.25, 0.20, 0.10, 0.50, 1.00]
+        [1, 0.26332, 0.140877, 0.853941, 0.477738, -0.25538, 0, 0],
+        [0.26332, 1, 0.143133, 0.490706, -0.495899, 0.231678, 0, 0],
+        [0.140877, 0.143133, 1, 0.026315, 0.222308, 0.298169, 0, 0],
+        [0.853941, 0.490706, 0.026315, 1, 0.196468, -0.340392, 0, 0],
+        [0.477738, -0.495899, 0.222308, 0.196468, 1, -0.252074, 0, 0],
+        [-0.25538, 0.231678, 0.298169, -0.340392, -0.252074, 1, 0, 0],
+        [0, 0, 0, 0, 0, 0, 1, 0],
+        [0, 0, 0, 0, 0, 0, 0, 1]
       ]
     },
     "crisis_times": {
@@ -86,14 +93,14 @@
       "market_regime": "crisis",
       "stress_level": "high",
       "matrix": [
-        [1.00, 0.20, 0.40, 0.85, 0.60, 0.10, 0.50, 0.50],
-        [0.20, 1.00, 0.50, 0.40, 0.30, 0.50, 0.35, 0.35],
-        [0.40, 0.50, 1.00, 0.50, 0.70, 0.30, 0.40, 0.40],
-        [0.85, 0.40, 0.50, 1.00, 0.60, 0.10, 0.55, 0.55],
-        [0.60, 0.30, 0.70, 0.60, 1.00, 0.20, 0.50, 0.50],
-        [0.10, 0.50, 0.30, 0.10, 0.20, 1.00, 0.25, 0.25],
-        [0.50, 0.35, 0.40, 0.55, 0.50, 0.25, 1.00, 0.70],
-        [0.50, 0.35, 0.40, 0.55, 0.50, 0.25, 0.70, 1.00]
+        [1, 0.2, 0.4, 0.85, 0.6, 0.1, 0.5, 0.5],
+        [0.2, 1, 0.5, 0.4, 0.3, 0.5, 0.35, 0.35],
+        [0.4, 0.5, 1, 0.5, 0.7, 0.3, 0.4, 0.4],
+        [0.85, 0.4, 0.5, 1, 0.6, 0.1, 0.55, 0.55],
+        [0.6, 0.3, 0.7, 0.6, 1, 0.2, 0.5, 0.5],
+        [0.1, 0.5, 0.3, 0.1, 0.2, 1, 0.25, 0.25],
+        [0.5, 0.35, 0.4, 0.55, 0.5, 0.25, 1, 0.7],
+        [0.5, 0.35, 0.4, 0.55, 0.5, 0.25, 0.7, 1]
       ]
     },
     "independent": {
@@ -101,14 +108,14 @@
       "market_regime": "theoretical",
       "stress_level": "none",
       "matrix": [
-        [1.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00],
-        [0.00, 1.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00],
-        [0.00, 0.00, 1.00, 0.00, 0.00, 0.00, 0.00, 0.00],
-        [0.00, 0.00, 0.00, 1.00, 0.00, 0.00, 0.00, 0.00],
-        [0.00, 0.00, 0.00, 0.00, 1.00, 0.00, 0.00, 0.00],
-        [0.00, 0.00, 0.00, 0.00, 0.00, 1.00, 0.00, 0.00],
-        [0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 1.00, 0.00],
-        [0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 1.00]
+        [1, 0, 0, 0, 0, 0, 0, 0],
+        [0, 1, 0, 0, 0, 0, 0, 0],
+        [0, 0, 1, 0, 0, 0, 0, 0],
+        [0, 0, 0, 1, 0, 0, 0, 0],
+        [0, 0, 0, 0, 1, 0, 0, 0],
+        [0, 0, 0, 0, 0, 1, 0, 0],
+        [0, 0, 0, 0, 0, 0, 1, 0],
+        [0, 0, 0, 0, 0, 0, 0, 1]
       ]
     },
     "defensive": {
@@ -116,14 +123,14 @@
       "market_regime": "defensive",
       "stress_level": "low",
       "matrix": [
-        [1.00, -0.30, -0.10, 0.65, 0.25, -0.05, 0.15, 0.15],
-        [-0.30, 1.00, 0.40, -0.10, -0.05, 0.50, 0.20, 0.20],
-        [-0.10, 0.40, 1.00, 0.10, 0.30, 0.25, 0.15, 0.15],
-        [0.65, -0.10, 0.10, 1.00, 0.25, -0.05, 0.20, 0.20],
-        [0.25, -0.05, 0.30, 0.25, 1.00, 0.05, 0.15, 0.15],
-        [-0.05, 0.50, 0.25, -0.05, 0.05, 1.00, 0.15, 0.15],
-        [0.15, 0.20, 0.15, 0.20, 0.15, 0.15, 1.00, 0.40],
-        [0.15, 0.20, 0.15, 0.20, 0.15, 0.15, 0.40, 1.00]
+        [1, -0.3, -0.1, 0.65, 0.25, -0.05, 0.15, 0.15],
+        [-0.3, 1, 0.4, -0.1, -0.05, 0.5, 0.2, 0.2],
+        [-0.1, 0.4, 1, 0.1, 0.3, 0.25, 0.15, 0.15],
+        [0.65, -0.1, 0.1, 1, 0.25, -0.05, 0.2, 0.2],
+        [0.25, -0.05, 0.3, 0.25, 1, 0.05, 0.15, 0.15],
+        [-0.05, 0.5, 0.25, -0.05, 0.05, 1, 0.15, 0.15],
+        [0.15, 0.2, 0.15, 0.2, 0.15, 0.15, 1, 0.4],
+        [0.15, 0.2, 0.15, 0.2, 0.15, 0.15, 0.4, 1]
       ]
     },
     "high_inflation": {
@@ -131,133 +138,146 @@
       "market_regime": "inflationary",
       "stress_level": "moderate",
       "matrix": [
-        [1.00, -0.20, 0.30, 0.75, 0.50, -0.10, 0.25, 0.25],
-        [-0.20, 1.00, 0.10, 0.05, 0.05, 0.40, 0.10, 0.10],
-        [0.30, 0.10, 1.00, 0.35, 0.65, 0.05, 0.30, 0.30],
-        [0.75, 0.05, 0.35, 1.00, 0.45, -0.05, 0.30, 0.30],
-        [0.50, 0.05, 0.65, 0.45, 1.00, -0.05, 0.35, 0.35],
-        [-0.10, 0.40, 0.05, -0.05, -0.05, 1.00, 0.05, 0.05],
-        [0.25, 0.10, 0.30, 0.30, 0.35, 0.05, 1.00, 0.55],
-        [0.25, 0.10, 0.30, 0.30, 0.35, 0.05, 0.55, 1.00]
+        [1, -0.2, 0.3, 0.75, 0.5, -0.1, 0.25, 0.25],
+        [-0.2, 1, 0.1, 0.05, 0.05, 0.4, 0.1, 0.1],
+        [0.3, 0.1, 1, 0.35, 0.65, 0.05, 0.3, 0.3],
+        [0.75, 0.05, 0.35, 1, 0.45, -0.05, 0.3, 0.3],
+        [0.5, 0.05, 0.65, 0.45, 1, -0.05, 0.35, 0.35],
+        [-0.1, 0.4, 0.05, -0.05, -0.05, 1, 0.05, 0.05],
+        [0.25, 0.1, 0.3, 0.3, 0.35, 0.05, 1, 0.55],
+        [0.25, 0.1, 0.3, 0.3, 0.35, 0.05, 0.55, 1]
       ]
     }
   },
-
   "asset_profiles": {
     "Protective": [
-      { "name": "Stocks", "allocation": 20.0, "ter": 0.2 },
-      { "name": "Bond", "allocation": 55.0, "ter": 0.1 },
-      { "name": "Gold", "allocation": 0.0, "ter": 0.12 },
-      { "name": "REIT", "allocation": 0.0, "ter": 0.3 },
-      { "name": "Commodities", "allocation": 0.0, "ter": 0.4 },
-      { "name": "Cash", "allocation": 25.0, "ter": 0.0 },
-      { "name": "UserAsset1", "allocation": 0.0, "ter": 0.0 },
-      { "name": "UserAsset2", "allocation": 0.0, "ter": 0.0 }
+      { "name": "Stocks", "allocation": 20, "ter": 0.2 },
+      { "name": "Bond", "allocation": 55, "ter": 0.1 },
+      { "name": "Gold", "allocation": 0, "ter": 0.12 },
+      { "name": "REIT", "allocation": 0, "ter": 0.3 },
+      { "name": "Commodities", "allocation": 0, "ter": 0.4 },
+      { "name": "Cash", "allocation": 25, "ter": 0 },
+      { "name": "UserAsset1", "allocation": 0, "ter": 0 },
+      { "name": "UserAsset2", "allocation": 0, "ter": 0 }
     ],
     "Conservative": [
-      { "name": "Stocks", "allocation": 40.0, "ter": 0.2 },
-      { "name": "Bond", "allocation": 40.0, "ter": 0.1 },
-      { "name": "Gold", "allocation": 0.0, "ter": 0.12 },
-      { "name": "REIT", "allocation": 0.0, "ter": 0.3 },
-      { "name": "Commodities", "allocation": 0.0, "ter": 0.4 },
-      { "name": "Cash", "allocation": 20.0, "ter": 0.0 },
-      { "name": "UserAsset1", "allocation": 0.0, "ter": 0.0 },
-      { "name": "UserAsset2", "allocation": 0.0, "ter": 0.0 }
+      { "name": "Stocks", "allocation": 40, "ter": 0.2 },
+      { "name": "Bond", "allocation": 40, "ter": 0.1 },
+      { "name": "Gold", "allocation": 0, "ter": 0.12 },
+      { "name": "REIT", "allocation": 0, "ter": 0.3 },
+      { "name": "Commodities", "allocation": 0, "ter": 0.4 },
+      { "name": "Cash", "allocation": 20, "ter": 0 },
+      { "name": "UserAsset1", "allocation": 0, "ter": 0 },
+      { "name": "UserAsset2", "allocation": 0, "ter": 0 }
     ],
     "Moderate": [
-      { "name": "Stocks", "allocation": 60.0, "ter": 0.2 },
-      { "name": "Bond", "allocation": 30.0, "ter": 0.1 },
-      { "name": "Gold", "allocation": 0.0, "ter": 0.12 },
-      { "name": "REIT", "allocation": 0.0, "ter": 0.3 },
-      { "name": "Commodities", "allocation": 0.0, "ter": 0.4 },
-      { "name": "Cash", "allocation": 10.0, "ter": 0.0 },
-      { "name": "UserAsset1", "allocation": 0.0, "ter": 0.0 },
-      { "name": "UserAsset2", "allocation": 0.0, "ter": 0.0 }
+      { "name": "Stocks", "allocation": 60, "ter": 0.2 },
+      { "name": "Bond", "allocation": 30, "ter": 0.1 },
+      { "name": "Gold", "allocation": 0, "ter": 0.12 },
+      { "name": "REIT", "allocation": 0, "ter": 0.3 },
+      { "name": "Commodities", "allocation": 0, "ter": 0.4 },
+      { "name": "Cash", "allocation": 10, "ter": 0 },
+      { "name": "UserAsset1", "allocation": 0, "ter": 0 },
+      { "name": "UserAsset2", "allocation": 0, "ter": 0 }
     ],
     "Aggressive": [
-      { "name": "Stocks", "allocation": 80.0, "ter": 0.2 },
-      { "name": "Bond", "allocation": 20.0, "ter": 0.1 },
-      { "name": "Gold", "allocation": 0.0, "ter": 0.12 },
-      { "name": "REIT", "allocation": 0.0, "ter": 0.3 },
-      { "name": "Commodities", "allocation": 0.0, "ter": 0.4 },
-      { "name": "Cash", "allocation": 0.0, "ter": 0.0 },
-      { "name": "UserAsset1", "allocation": 0.0, "ter": 0.0 },
-      { "name": "UserAsset2", "allocation": 0.0, "ter": 0.0 }
-    ],  
+      { "name": "Stocks", "allocation": 80, "ter": 0.2 },
+      { "name": "Bond", "allocation": 20, "ter": 0.1 },
+      { "name": "Gold", "allocation": 0, "ter": 0.12 },
+      { "name": "REIT", "allocation": 0, "ter": 0.3 },
+      { "name": "Commodities", "allocation": 0, "ter": 0.4 },
+      { "name": "Cash", "allocation": 0, "ter": 0 },
+      { "name": "UserAsset1", "allocation": 0, "ter": 0 },
+      { "name": "UserAsset2", "allocation": 0, "ter": 0 }
+    ],
     "Dynamic": [
-      { "name": "Stocks", "allocation": 70.0, "ter": 0.2 },
-      { "name": "Bond", "allocation": 10.0, "ter": 0.1 },
-      { "name": "Gold", "allocation": 15.0, "ter": 0.12 },
-      { "name": "REIT", "allocation": 0.0, "ter": 0.3 },
-      { "name": "Commodities", "allocation": 0.0, "ter": 0.4 },
-      { "name": "Cash", "allocation": 5.0, "ter": 0.0 },
-      { "name": "UserAsset1", "allocation": 0.0, "ter": 0.0 },
-      { "name": "UserAsset2", "allocation": 0.0, "ter": 0.0 }
-    ],  
+      { "name": "Stocks", "allocation": 70, "ter": 0.2 },
+      { "name": "Bond", "allocation": 10, "ter": 0.1 },
+      { "name": "Gold", "allocation": 15, "ter": 0.12 },
+      { "name": "REIT", "allocation": 0, "ter": 0.3 },
+      { "name": "Commodities", "allocation": 0, "ter": 0.4 },
+      { "name": "Cash", "allocation": 5, "ter": 0 },
+      { "name": "UserAsset1", "allocation": 0, "ter": 0 },
+      { "name": "UserAsset2", "allocation": 0, "ter": 0 }
+    ],
     "StrategicAccumulation": [
-      { "name": "Stocks", "allocation": 70.0, "ter": 0.2 },
-      { "name": "Bond", "allocation": 0.0, "ter": 0.1 },
-      { "name": "Gold", "allocation": 30.0, "ter": 0.12 },
-      { "name": "REIT", "allocation": 0.0, "ter": 0.3 },
-      { "name": "Commodities", "allocation": 0.0, "ter": 0.4 },
-      { "name": "Cash", "allocation": 0.0, "ter": 0.0 },
-      { "name": "UserAsset1", "allocation": 0.0, "ter": 0.0 },
-      { "name": "UserAsset2", "allocation": 0.0, "ter": 0.0 }
+      { "name": "Stocks", "allocation": 70, "ter": 0.2 },
+      { "name": "Bond", "allocation": 0, "ter": 0.1 },
+      { "name": "Gold", "allocation": 30, "ter": 0.12 },
+      { "name": "REIT", "allocation": 0, "ter": 0.3 },
+      { "name": "Commodities", "allocation": 0, "ter": 0.4 },
+      { "name": "Cash", "allocation": 0, "ter": 0 },
+      { "name": "UserAsset1", "allocation": 0, "ter": 0 },
+      { "name": "UserAsset2", "allocation": 0, "ter": 0 }
     ],
     "Diversified": [
-      { "name": "Stocks", "allocation": 30.0, "ter": 0.2 },
-      { "name": "Bond", "allocation": 15.0, "ter": 0.1 },
-      { "name": "Gold", "allocation": 15.0, "ter": 0.12 },
-      { "name": "REIT", "allocation": 15.0, "ter": 0.3 },
-      { "name": "Commodities", "allocation": 15.0, "ter": 0.4 },
-      { "name": "Cash", "allocation": 10.0, "ter": 0.0 },
-      { "name": "UserAsset1", "allocation": 0.0, "ter": 0.0 },
-      { "name": "UserAsset2", "allocation": 0.0, "ter": 0.0 }
+      { "name": "Stocks", "allocation": 30, "ter": 0.2 },
+      { "name": "Bond", "allocation": 15, "ter": 0.1 },
+      { "name": "Gold", "allocation": 15, "ter": 0.12 },
+      { "name": "REIT", "allocation": 15, "ter": 0.3 },
+      { "name": "Commodities", "allocation": 15, "ter": 0.4 },
+      { "name": "Cash", "allocation": 10, "ter": 0 },
+      { "name": "UserAsset1", "allocation": 0, "ter": 0 },
+      { "name": "UserAsset2", "allocation": 0, "ter": 0 }
     ],
     "StrategicDecumulation": [
-      { "name": "Stocks", "allocation": 40.0, "ter": 0.2 },
-      { "name": "Bond", "allocation": 20.0, "ter": 0.1 },
-      { "name": "Gold", "allocation": 30.0, "ter": 0.12 },
-      { "name": "REIT", "allocation": 0.0, "ter": 0.3 },
-      { "name": "Commodities", "allocation": 0.0, "ter": 0.4 },
-      { "name": "Cash", "allocation": 10.0, "ter": 0.0 },
-      { "name": "UserAsset1", "allocation": 0.0, "ter": 0.0 },
-      { "name": "UserAsset2", "allocation": 0.0, "ter": 0.0 }
+      { "name": "Stocks", "allocation": 40, "ter": 0.2 },
+      { "name": "Bond", "allocation": 20, "ter": 0.1 },
+      { "name": "Gold", "allocation": 30, "ter": 0.12 },
+      { "name": "REIT", "allocation": 0, "ter": 0.3 },
+      { "name": "Commodities", "allocation": 0, "ter": 0.4 },
+      { "name": "Cash", "allocation": 10, "ter": 0 },
+      { "name": "UserAsset1", "allocation": 0, "ter": 0 },
+      { "name": "UserAsset2", "allocation": 0, "ter": 0 }
     ],
     "UserDefined": [
-      { "name": "Stocks", "allocation": 0.0, "ter": 0.2 },
-      { "name": "Bond", "allocation": 0.0, "ter": 0.1 },
-      { "name": "Gold", "allocation": 0.0, "ter": 0.12 },
-      { "name": "REIT", "allocation": 0.0, "ter": 0.3 },
-      { "name": "Commodities", "allocation": 0.0, "ter": 0.4 },
-      { "name": "Cash", "allocation": 0.0, "ter": 0.0 },
-      { "name": "UserAsset1", "allocation": 0.0, "ter": 0.0 },
-      { "name": "UserAsset2", "allocation": 0.0, "ter": 0.0 }
+      { "name": "Stocks", "allocation": 0, "ter": 0.2 },
+      { "name": "Bond", "allocation": 0, "ter": 0.1 },
+      { "name": "Gold", "allocation": 0, "ter": 0.12 },
+      { "name": "REIT", "allocation": 0, "ter": 0.3 },
+      { "name": "Commodities", "allocation": 0, "ter": 0.4 },
+      { "name": "Cash", "allocation": 0, "ter": 0 },
+      { "name": "UserAsset1", "allocation": 0, "ter": 0 },
+      { "name": "UserAsset2", "allocation": 0, "ter": 0 }
     ]
   },
-
   "correlation_metadata": {
     "data_sources": [
-      "Historical correlation analysis 1990-2023",
-      "Academic research on asset correlations",
-      "Crisis period analysis (2008, 2020)",
-      "Central bank and institutional research"
+      "https://www.msci.com/documents/10199/255599/msci-world-index-eur-net.pdf",
+      "https://investingintheweb.com/blog/msci-world-index-historical-data/",
+      "https://www.vuvb.nl/wp-content/uploads/matrix_book_eur_20151.pdf",
+      "https://www.mejudice.nl/docs/default-source/download/bijlage-16f68dc800cab62c08a14ff000058593c.pdfcc3be7c_0",
+      "https://www.ishares.com/uk/professional/en/literature/kiid/ucits_kiid-ishares-euro-aggregate-bond-index-a2-eur-gb-lu0836513423-en.pdf?siteEntryPassthrough=true&switchLocale=y",
+      "https://research.ftserussell.com/products/downloads/FTSE-EPRA-NAREIT-Developed-Europe.pdf",
+      "https://etf.dws.com/en-gb/AssetDownload/Index/33f44f2a-4742-4953-a9a2-697f1f3b9d1e/DWS-UKKIID-LU0489337690-GB-en-2025-11-10.pdf",
+      "https://www.gold.org/goldhub/research/golds-long-term-expected-returns/building-block-approach",
+      "https://jpmorganchaseco.gcs-web.com/static-files/8ed086ab-f019-46ac-adc8-a40b7899ca0b",
+      "https://www.etf.com/docs/magazine/1/2011_190.pdf",
+      "https://www.marketscreener.com/quote/index/S-P-GSCI-TR-46869250/quotes/",
+      "https://www.spglobal.com/spdji/en/documents/performance-reports/dashboard-us-2024-12.pdf",
+      "https://data-api.ecb.europa.eu/service/data/EXR/A.USD.EUR.SP00.E?startPeriod=2004&endPeriod=2024&format=csvdata",
+      "https://data-api.ecb.europa.eu/service/data/EON/D.EONIA_TO.RATE?startPeriod=2004-12-30&endPeriod=2021-12-31&format=csvdata",
+      "https://data-api.ecb.europa.eu/service/data/EST/B.EU000A2X2A25.WT?startPeriod=2022-01-01&endPeriod=2024-12-31&format=csvdata",
+      "https://pages.stern.nyu.edu/~adamodar/New_Home_Page/datafile/histretSP.html",
+      "https://am.jpmorgan.com/content/dam/jpm-am-aem/global/en/insights/market-insights/guide-to-the-markets/mi-guide-to-the-markets-ce-en.pdf",
+      "https://www.ssga.com/us/en/intermediary/insights/long-term-asset-class-forecasts-q1-2026",
+      "https://www.ubs.com/global/en/wealthmanagement/insights/2025/global-investment-returns-yearbook.html"
     ],
-    "update_frequency": "quarterly_review",
-    "last_updated": "2024-01-01",
-    "methodology": "Pearson correlation coefficients with regime-dependent adjustments",
+    "last_updated": "2026-10-29",
+    "update_frequency": "manual_snapshot",
+    "methodology": "Annual EUR Pearson correlation, 2008–2024, with mixed gross/net European property index series; estimates are uncertain. Other regimes are hypothetical; clipping changes realised correlations.",
     "validation_checks": [
       "positive_semi_definite",
-      "symmetric_matrix", 
+      "symmetric_matrix",
       "unit_diagonal",
       "correlation_bounds"
     ],
     "scenarios_explanation": {
-      "normal_times": "Based on 15-year average correlations excluding crisis periods",
-      "crisis_times": "Based on correlations during 2008-2009 and 2020 market stress",
-      "independent": "Theoretical scenario for comparison with uncorrelated returns",
-      "defensive": "Optimized for bear market protection with stronger safe-haven correlations",
-      "high_inflation": "Adjusted for inflationary environments with commodity focus"
+      "normal_times": "2008–2024 annual EUR correlations, including crisis years; REIT gross/net series joined.",
+      "crisis_times": "Hypothetical stress scenario; not a statistical estimate of a specified crisis sample.",
+      "independent": "Theoretical zero-correlation scenario.",
+      "defensive": "Hypothetical defensive scenario.",
+      "high_inflation": "Hypothetical inflation scenario."
     }
   }
 }

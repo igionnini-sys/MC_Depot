@@ -1,13 +1,15 @@
 import { TaxEngine, type WithdrawalResult } from '../engine/taxEngine';
 import type { SimulationParams } from '../engine/types';
 import { GermanyTaxSession, type PortfolioTaxProfile } from './de';
+import { ItalyTaxSession } from './it';
+import { NetherlandsTaxSession } from './nl';
 import type { CountryCode, TaxRegimeDescriptor, TaxSession } from './types';
 
 export const TAX_REGIMES: readonly TaxRegimeDescriptor[] = [
   { code: 'simplified', implemented: true, verified: true },
   { code: 'de', implemented: true, verified: false },
-  { code: 'it', implemented: false, verified: false },
-  { code: 'nl', implemented: false, verified: false },
+  { code: 'it', implemented: true, verified: true },
+  { code: 'nl', implemented: true, verified: false },
 ];
 
 /**
@@ -60,6 +62,8 @@ export function createTaxSession(
   params: SimulationParams,
   accProfile?: PortfolioTaxProfile,
   retProfile?: PortfolioTaxProfile,
+  accCashShare = 0,
+  retCashShare = 0,
 ): TaxSession {
   const yearsAcc = Math.trunc(params.yearsToRetirement);
   const country: CountryCode = params.taxCountry ?? 'simplified';
@@ -67,7 +71,9 @@ export function createTaxSession(
     case 'de':
       return new GermanyTaxSession(params, accProfile, retProfile);
     case 'it':
+      return new ItalyTaxSession(params);
     case 'nl':
+      return new NetherlandsTaxSession(params, accCashShare, retCashShare);
     case 'simplified':
     default:
       return new SimplifiedTaxSession(params.capitalGainsTaxRate, yearsAcc + 2);

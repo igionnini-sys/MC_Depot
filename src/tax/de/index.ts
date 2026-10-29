@@ -88,6 +88,24 @@ export class GermanyTaxSession implements TaxSession {
   get totalCapitalGainsRealized(): number {
     return this.brokerage.totalCapitalGainsRealized + this.avd.totalCapitalGainsRealized;
   }
+  get brokerageFinalValue(): number {
+    return this.brokerage.portfolioValue;
+  }
+  get pensionFinalValue(): number {
+    return this.avd.portfolioValue;
+  }
+  get brokerageTaxesPaid(): number {
+    return this.brokerage.totalTaxesPaid;
+  }
+  get pensionTaxesPaid(): number {
+    return this.avd.totalTaxesPaid;
+  }
+  get stateSubsidiesReceived(): number {
+    return this.avd.totalZulagen;
+  }
+  get extraTaxRefundsReceived(): number {
+    return this.avd.totalExtraTaxRefunds;
+  }
 
   addInitialAmount(amount: number): void {
     if (amount > 0) this.brokerage.addContribution(amount);

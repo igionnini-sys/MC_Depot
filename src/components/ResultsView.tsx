@@ -5,6 +5,9 @@ import {
 } from '../engine/stats';
 import type { SimulationParams, SimulationResults } from '../engine/types';
 import { useI18n } from '../i18n';
+import { abgeltungsteuerCombinedRate, sparerPauschbetragForYear } from '../tax/de';
+import { italianPensionPayoutTaxRate } from '../tax/it';
+import { box3ParamsForYear } from '../tax/nl';
 import { ComparisonCharts, CorrelationCharts, DistributionCharts, LossProbabilityChart, PhaseComparisonChart, VarDistributionChart } from './ResultsCharts';
 import { Alert, Card, Collapsible, DataTable, Stat, StatGrid, Tabs, type Tone } from './ui';
 
@@ -135,23 +138,114 @@ function WithdrawalAnalysis({ params: p, avgNet }: { params: SimulationParams; a
 
 function TaxAnalysis({ bundle }: { bundle: ResultsBundle }) {
   const { t, eur, num } = useI18n();
-  const rate = bundle.params.capitalGainsTaxRate;
+  const p = bundle.params;
+  const rate = p.capitalGainsTaxRate;
   const ta = bundle.results.taxAnalysis;
+  const isDe = p.taxCountry === 'de';
+  const isIt = p.taxCountry === 'it';
+  const isNl = p.taxCountry === 'nl';
+  const deAbgRate = abgeltungsteuerCombinedRate(p.kirchensteuer ?? 'none') * 100;
+  const dePauschbetrag = sparerPauschbetragForYear(p.filingStatus ?? 'single', 1);
+  const itPensionRate = italianPensionPayoutTaxRate(p.yearsToRetirement) * 100;
+  const nlYp = box3ParamsForYear(p.startYear ?? 2027);
+  const nlAllowance = (p.filingStatus ?? 'single') === 'couple' ? nlYp.allowanceCouple : nlYp.allowanceSingle;
+
   return (
-    <Card title={t('tax_analysis')}>
+    <Card title={isDe ? t('tax_analysis_de') : isIt ? t('tax_analysis_it') : isNl ? t('tax_analysis_nl') : t('tax_analysis')}>
+      {(isDe || isNl) && (
+        <Alert tone="warning" title={t('tax_unverified_warning_title')}>
+          {isDe ? t('tax_unverified_warning_de') : t('tax_unverified_warning_nl')}
+        </Alert>
+      )}
       <StatGrid>
-        <Stat label={t('cg_tax_rate')} value={`${num(rate, 1)}%`} />
+        <Stat
+          label={isDe ? t('de_abg_rate') : isNl ? t('nl_box3_rate') : t('cg_tax_rate')}
+          value={`${num(isDe ? deAbgRate : isIt ? 26 : isNl ? nlYp.taxRate * 100 : rate, 2)}%`}
+        />
+        {isIt && <Stat label={t('it_pension_payout_rate')} value={`${num(itPensionRate, 2)}%`} />}
+        {isNl && <Stat label={t('nl_box3_allowance')} value={eur(nlAllowance)} />}
         <Stat label={t('avg_effective_tax_rate')} help={t('avg_effective_tax_rate_help')} value={`${num(ta.effectiveTaxRate.mean, 2)}%`} />
         <Stat label={t('avg_total_taxes')} value={eur(ta.totalTaxes.mean)} />
+        {isDe && ta.containers && (
+          <Stat
+            label={t('avg_state_subsidies')}
+            help={t('avg_state_subsidies_help')}
+            value={eur(ta.containers.stateSubsidiesMean)}
+            tone="success"
+          />
+        )}
+        {(isDe || isIt) && ta.containers && (
+          <Stat
+            label={t('avg_extra_tax_refunds')}
+            help={t('avg_extra_tax_refunds_help')}
+            value={eur(ta.containers.extraTaxRefundsMean)}
+            tone="info"
+          />
+        )}
       </StatGrid>
+      {(isDe || isIt) && ta.containers && (
+        <>
+          <h3>{t('container_comparison_title')}</h3>
+          <DataTable
+            columns={[
+              t('container_col'),
+              t('container_avg_taxes'),
+              t('container_median_final'),
+              t('container_mean_final'),
+            ]}
+            numeric={[false, true, true, true]}
+            rows={[
+              [
+                isIt ? t('container_pension_it') : t('container_avd'),
+                eur(ta.containers.pensionTaxesMean),
+                eur(ta.containers.pensionFinalMedian),
+                eur(ta.containers.pensionFinalMean),
+              ],
+              [
+                t('container_brokerage'),
+                eur(ta.containers.brokerageTaxesMean),
+                eur(ta.containers.brokerageFinalMedian),
+                eur(ta.containers.brokerageFinalMean),
+              ],
+            ]}
+          />
+        </>
+      )}
       <Collapsible title={t('how_taxation_works')}>
-        <ol className="plain-list">
-          <li>{t('tax_mech_1', num(rate, 1))}</li>
-          <li>{t('tax_mech_2')}</li>
-          <li>{t('tax_mech_3')}</li>
-          <li>{t('tax_mech_4')}</li>
-        </ol>
-        <p>{t('tax_example', num(rate, 1), eur(10000 * (1 - (rate / 100) * 0.5)))}</p>
+        {isDe ? (
+          <>
+            <ol className="plain-list">
+              <li>{t('de_tax_mech_1', num(deAbgRate, 2), eur(dePauschbetrag))}</li>
+              <li>{t('de_tax_mech_2')}</li>
+              <li>{t('de_tax_mech_3')}</li>
+              <li>{t('de_tax_mech_4')}</li>
+            </ol>
+            <p className="muted small">{t('de_tax_exclusions')}</p>
+          </>
+        ) : isIt ? (
+          <ol className="plain-list">
+            <li>{t('it_tax_mech_1')}</li>
+            <li>{t('it_tax_mech_2')}</li>
+            <li>{t('it_tax_mech_3', num(itPensionRate, 2))}</li>
+            <li>{t('it_tax_mech_4')}</li>
+          </ol>
+        ) : isNl ? (
+          <ol className="plain-list">
+            <li>{t('nl_tax_mech_1', eur(nlAllowance), num(nlYp.taxRate * 100, 1))}</li>
+            <li>{t('nl_tax_mech_2', num(nlYp.deemedReturnSavings * 100, 2), num(nlYp.deemedReturnInvestments * 100, 2))}</li>
+            <li>{t('nl_tax_mech_3')}</li>
+          </ol>
+        ) : (
+          <>
+            <ol className="plain-list">
+              <li>{t('tax_mech_1', num(rate, 1))}</li>
+              <li>{t('tax_mech_2')}</li>
+              <li>{t('tax_mech_3')}</li>
+              <li>{t('tax_mech_4')}</li>
+            </ol>
+            <p>{t('tax_example', num(rate, 1), eur(10000 * (1 - (rate / 100) * 0.5)))}</p>
+          </>
+        )}
       </Collapsible>
     </Card>
   );

@@ -214,6 +214,7 @@ function Disclaimers() {
     ['returns_disclaimer', 'returns_text'],
     ['correlation_disclaimer', 'correlation_text'],
     ['real_withdrawal_disclaimer', 'real_withdrawal_text'],
+    ['tax_disclaimer', 'tax_disclaimer_text'],
     ['data_info', 'data_text'],
   ];
   return (

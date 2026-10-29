@@ -5,8 +5,11 @@
  * in nominal euros; deflation to today's purchasing power happens at the boundaries.
  */
 import { createNormal, createRng, isPositiveSemiDefinite, nearestCorrelationMatrix, psdFactor } from './random';
+import { fitCensoredNormal } from './returns';
+import { CORRELATION_ASSETS, DEFAULT_CORRELATION_MATRIX } from '../config';
 import { mean, max, min, percentile, std } from './stats';
 import { computePortfolioTaxProfile, type PortfolioTaxProfile } from '../tax/de';
+import { computeNlPortfolioCashShare } from '../tax/nl';
 import { createTaxSession } from '../tax/registry';
 import type { Asset, SimulationParams, SimulationRequest, SimulationResults, SummaryStats, TaxAnalysis, TaxDetails } from './types';
 
@@ -35,9 +38,10 @@ interface PhaseData {
 }
 
 function phaseData(assets: Asset[], corr: number[][] | null): PhaseData {
+  const fitted = assets.map((a) => fitCensoredNormal(a.return / 100, a.volatility / 100, a.min_return / 100, a.max_return / 100));
   return {
-    mean: assets.map((a) => a.return / 100),
-    vol: assets.map((a) => a.volatility / 100),
+    mean: fitted.map((a) => a.mean),
+    vol: fitted.map((a) => a.sd),
     alloc: assets.map((a) => a.allocation / 100),
     minR: assets.map((a) => a.min_return / 100),
     maxR: assets.map((a) => a.max_return / 100),
@@ -46,21 +50,12 @@ function phaseData(assets: Asset[], corr: number[][] | null): PhaseData {
   };
 }
 
-/** Pairwise defaults used by correlation_engine.py when no matrix is configured. */
-const DEFAULT_PAIRS: Record<string, number> = {
-  'Stocks|Bond': -0.1, 'Stocks|Gold': 0.1, 'Stocks|REIT': 0.7, 'Stocks|Commodities': 0.3, 'Stocks|Cash': 0.0,
-  'Bond|Gold': 0.2, 'Bond|REIT': 0.1, 'Bond|Commodities': 0.1, 'Bond|Cash': 0.3,
-  'Gold|REIT': 0.2, 'Gold|Commodities': 0.4, 'Gold|Cash': 0.1,
-  'REIT|Commodities': 0.3, 'REIT|Cash': 0.0, 'Commodities|Cash': 0.0,
-};
-
 export function defaultCorrelationMatrix(names: string[]): number[][] {
   return names.map((a, i) =>
     names.map((b, j) => {
       if (i === j) return 1;
-      const c = DEFAULT_PAIRS[`${a}|${b}`] ?? DEFAULT_PAIRS[`${b}|${a}`];
-      if (c !== undefined) return c;
-      return a.includes('UserAsset') || b.includes('UserAsset') ? 0.2 : 0.1;
+      const ai = CORRELATION_ASSETS.indexOf(a), bi = CORRELATION_ASSETS.indexOf(b);
+      return ai >= 0 && bi >= 0 ? DEFAULT_CORRELATION_MATRIX[ai][bi] : 0;
     }),
   );
 }
@@ -94,6 +89,8 @@ export function runSimulation(req: SimulationRequest, onProgress?: ProgressFn): 
   const ret = phaseData(retirementAssets, retCorr);
   const accTaxProfile = computePortfolioTaxProfile(accumulationAssets);
   const retTaxProfile = computePortfolioTaxProfile(retirementAssets);
+  const accCashShare = computeNlPortfolioCashShare(accumulationAssets);
+  const retCashShare = computeNlPortfolioCashShare(retirementAssets);
 
   const normal = createNormal(createRng(req.seed));
   const n = p.nSimulations;
@@ -106,11 +103,18 @@ export function runSimulation(req: SimulationRequest, onProgress?: ProgressFn): 
   const taxesPaid = new Float64Array(n);
   const effectiveRates = new Float64Array(n);
   const finalWithdrawals = new Float64Array(n);
+  const hasContainers = !!p.taxCountry && p.taxCountry !== 'simplified';
+  const brokFinals = hasContainers ? new Float64Array(n) : null;
+  const pensFinals = hasContainers ? new Float64Array(n) : null;
+  let sumBrokTax = 0;
+  let sumPensTax = 0;
+  let sumSubsidies = 0;
+  let sumExtraRefunds = 0;
 
   const step = Math.max(1, Math.floor(n / 100));
   for (let s = 0; s < n; s++) {
     if (onProgress && s % step === 0) onProgress(s, n);
-    const r = simulateOne(p, acc, ret, normal, accTaxProfile, retTaxProfile);
+    const r = simulateOne(p, acc, ret, normal, accTaxProfile, retTaxProfile, accCashShare, retCashShare);
     out.accumulation[s] = r.accumulationReal;
     out.accumulationNominal[s] = r.accumulationNominal;
     out.final[s] = r.final;
@@ -118,6 +122,14 @@ export function runSimulation(req: SimulationRequest, onProgress?: ProgressFn): 
     taxesPaid[s] = r.tax.totalTaxesPaid;
     effectiveRates[s] = r.tax.totalWithdrawals > 0 ? (r.tax.totalTaxesPaid / r.tax.totalWithdrawals) * 100 : 0;
     finalWithdrawals[s] = r.tax.finalWithdrawal;
+    if (hasContainers && brokFinals && pensFinals) {
+      brokFinals[s] = r.tax.brokerageFinalValue ?? 0;
+      pensFinals[s] = r.tax.pensionFinalValue ?? 0;
+      sumBrokTax += r.tax.brokerageTaxesPaid ?? 0;
+      sumPensTax += r.tax.pensionTaxesPaid ?? 0;
+      sumSubsidies += r.tax.stateSubsidiesReceived ?? 0;
+      sumExtraRefunds += r.tax.extraTaxRefundsReceived ?? 0;
+    }
   }
   onProgress?.(n, n);
 
@@ -125,6 +137,19 @@ export function runSimulation(req: SimulationRequest, onProgress?: ProgressFn): 
     totalTaxes: summary(taxesPaid),
     effectiveTaxRate: summary(effectiveRates),
     avgFinalWithdrawal: mean(finalWithdrawals),
+    containers:
+      hasContainers && brokFinals && pensFinals && n > 0
+        ? {
+            brokerageFinalMean: mean(brokFinals),
+            brokerageFinalMedian: percentile(brokFinals, 50),
+            pensionFinalMean: mean(pensFinals),
+            pensionFinalMedian: percentile(pensFinals, 50),
+            brokerageTaxesMean: sumBrokTax / n,
+            pensionTaxesMean: sumPensTax / n,
+            stateSubsidiesMean: sumSubsidies / n,
+            extraTaxRefundsMean: sumExtraRefunds / n,
+          }
+        : undefined,
   };
   return { ...out, taxAnalysis, correlationUsed: useCorr };
 }
@@ -164,11 +189,13 @@ function simulateOne(
   normal: () => number,
   accTaxProfile: PortfolioTaxProfile,
   retTaxProfile: PortfolioTaxProfile,
+  accCashShare = 0,
+  retCashShare = 0,
 ): SingleResult {
   const inflation = p.inflation / 100;
   const yearsAcc = Math.trunc(p.yearsToRetirement);
   const yearsRet = Math.trunc(p.yearsRetired);
-  const tax = createTaxSession(p, accTaxProfile, retTaxProfile);
+  const tax = createTaxSession(p, accTaxProfile, retTaxProfile, accCashShare, retCashShare);
   const zA = new Array<number>(acc.mean.length), cA = new Array<number>(acc.mean.length);
   const zR = new Array<number>(ret.mean.length), cR = new Array<number>(ret.mean.length);
 
@@ -217,6 +244,12 @@ function simulateOne(
         p.useRealWithdrawal && p.yearsRetired > 0
           ? p.withdrawal * (1 + inflation) ** (p.yearsToRetirement + p.yearsRetired - 1)
           : p.withdrawal,
+      brokerageFinalValue: tax.brokerageFinalValue,
+      pensionFinalValue: tax.pensionFinalValue,
+      brokerageTaxesPaid: tax.brokerageTaxesPaid,
+      pensionTaxesPaid: tax.pensionTaxesPaid,
+      stateSubsidiesReceived: tax.stateSubsidiesReceived,
+      extraTaxRefundsReceived: tax.extraTaxRefundsReceived,
     },
   };
 }

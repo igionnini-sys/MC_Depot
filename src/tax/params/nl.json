@@ -1,0 +1,57 @@
+{
+  "country": "nl",
+  "description": "Netherlands Box 3 (Overbruggingswet box 3) parameters by year: tax-free wealth allowance, deemed return rates by category, and Box 3 tax rate.",
+  "box3": {
+    "cashAssets": ["Cash"],
+    "byYear": {
+      "default": {
+        "taxRate": 0.36,
+        "allowanceSingle": 57684,
+        "allowanceCouple": 115368,
+        "deemedReturnSavings": 0.0144,
+        "deemedReturnInvestments": 0.0588,
+        "source": "Belastingdienst Box 3 (2025 parameters projected forward; future Wet werkelijk rendement box 3 subject to legislative change)",
+        "verified": false
+      },
+      "years": {
+        "2024": {
+          "taxRate": 0.36,
+          "allowanceSingle": 57000,
+          "allowanceCouple": 114000,
+          "deemedReturnSavings": 0.0144,
+          "deemedReturnInvestments": 0.0604,
+          "source": "Belastingdienst Overbruggingswet box 3 (2024 definitive rates)",
+          "verified": true
+        },
+        "2025": {
+          "taxRate": 0.36,
+          "allowanceSingle": 57684,
+          "allowanceCouple": 115368,
+          "deemedReturnSavings": 0.0144,
+          "deemedReturnInvestments": 0.0588,
+          "source": "Belastingdienst Overbruggingswet box 3 (2025 provisional rates)",
+          "verified": true
+        },
+        "2026": {
+          "taxRate": 0.36,
+          "allowanceSingle": 57684,
+          "allowanceCouple": 115368,
+          "deemedReturnSavings": 0.0144,
+          "deemedReturnInvestments": 0.0588,
+          "source": "Projection based on 2025 Box 3 parameters (unverified future year)",
+          "verified": false
+        },
+        "2027": {
+          "taxRate": 0.36,
+          "allowanceSingle": 57684,
+          "allowanceCouple": 115368,
+          "deemedReturnSavings": 0.0144,
+          "deemedReturnInvestments": 0.0588,
+          "source": "Projection based on 2025 Box 3 parameters (Box 3 reform pending)",
+          "verified": false
+        }
+      }
+    }
+  }
+}
+

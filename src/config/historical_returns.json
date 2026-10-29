@@ -1,0 +1,450 @@
+{
+  "period": {
+    "start": 2008,
+    "end": 2024,
+    "observations": 17
+  },
+  "currency": "EUR",
+  "units": "percent",
+  "fx_start": 1.4721,
+  "methodology": {
+    "purpose": "Common historical window for correlations and risk context; planning assumptions are separate from historical means.",
+    "fx": "Unhedged USD series converted with ECB year-end fixing: (1+rUSD)*FX_previous/FX_current-1.",
+    "cash": "Calendar-day compounding of EONIA through 2021 and ESTR from 2022, ACT/360; forward-filled holidays. Overnight proxy, not retail deposit.",
+    "reit": "2008\u20132014 FTSE EPRA Nareit Developed Europe gross total return; 2015\u20132024 DWS FTSE EPRA Nareit Developed Europe net total return. Different dividend tax conventions; approximate historical proxy.",
+    "bond": "Bloomberg Euro Aggregate total return, broad mix government, investment grade corporate and other investment grade euro bonds.",
+    "equity": "MSCI World net total return in EUR; 2008\u20132011 USD net returns converted using annual ECB fixings; 2012\u20132024 MSCI EUR factsheet."
+  },
+  "benchmarks": {
+    "Stocks": "MSCI World developed markets net total return in EUR",
+    "Bond": "Bloomberg Euro Aggregate total return in EUR, investment grade government and corporate mix",
+    "Gold": "Gold spot (NYU annual USD series, converted to EUR)",
+    "REIT": "FTSE EPRA Nareit Developed Europe real estate, gross 2008\u20132014 and net 2015\u20132024, EUR",
+    "Commodities": "S&P GSCI Total Return (futures and collateral, converted to EUR)",
+    "Cash": "EUR overnight EONIA / ESTR"
+  },
+  "sources": [
+    {
+      "id": "msci-eur",
+      "url": "https://www.msci.com/documents/10199/255599/msci-world-index-eur-net.pdf",
+      "assets": [
+        "Stocks"
+      ],
+      "note": "2012\u20132024, net, EUR; since 2000 historical CAGR and volatility context."
+    },
+    {
+      "id": "msci-usd-early",
+      "url": "https://investingintheweb.com/blog/msci-world-index-historical-data/",
+      "assets": [
+        "Stocks"
+      ],
+      "note": "2008\u20132011 USD net annual returns, attributed to MSCI; convert to EUR using ECB exchange rates."
+    },
+    {
+      "id": "dimensional-long-world",
+      "url": "https://www.vuvb.nl/wp-content/uploads/matrix_book_eur_20151.pdf",
+      "assets": [
+        "Stocks"
+      ],
+      "note": "Long 1970\u20132014 MSCI World total return chart in synthetic EUR before 1999."
+    },
+    {
+      "id": "bloomberg-annual",
+      "url": "https://www.mejudice.nl/docs/default-source/download/bijlage-16f68dc800cab62c08a14ff000058593c.pdfcc3be7c_0",
+      "assets": [
+        "Bond"
+      ],
+      "note": "2008\u20132023 annual EUR Bloomberg Euro Aggregate, two decimals."
+    },
+    {
+      "id": "blackrock-aggregate",
+      "url": "https://www.ishares.com/uk/professional/en/literature/kiid/ucits_kiid-ishares-euro-aggregate-bond-index-a2-eur-gb-lu0836513423-en.pdf?siteEntryPassthrough=true&switchLocale=y",
+      "assets": [
+        "Bond"
+      ],
+      "note": "2024 benchmark annual return 2.6%."
+    },
+    {
+      "id": "ftse-europe",
+      "url": "https://research.ftserussell.com/products/downloads/FTSE-EPRA-NAREIT-Developed-Europe.pdf",
+      "assets": [
+        "REIT"
+      ],
+      "note": "2008\u20132014 FTSE developed Europe gross EUR total return (benchmark row); excludes partial 2020."
+    },
+    {
+      "id": "dws-europe",
+      "url": "https://etf.dws.com/en-gb/AssetDownload/Index/33f44f2a-4742-4953-a9a2-697f1f3b9d1e/DWS-UKKIID-LU0489337690-GB-en-2025-11-10.pdf",
+      "assets": [
+        "REIT"
+      ],
+      "note": "2015\u20132024 FTSE EPRA/NAREIT developed Europe TR net index, EUR."
+    },
+    {
+      "id": "wgc-long",
+      "url": "https://www.gold.org/goldhub/research/golds-long-term-expected-returns/building-block-approach",
+      "assets": [
+        "Gold"
+      ],
+      "note": "1971\u20132023 and 2025\u20132040 model USD, not a EUR forecast."
+    },
+    {
+      "id": "gsci-2005-2008",
+      "url": "https://jpmorganchaseco.gcs-web.com/static-files/8ed086ab-f019-46ac-adc8-a40b7899ca0b",
+      "assets": [
+        "Commodities"
+      ],
+      "note": "Calendar annual total returns, appendix; 2006 -15.09 and 2007 +32.67."
+    },
+    {
+      "id": "gsci-2009-2010",
+      "url": "https://www.etf.com/docs/magazine/1/2011_190.pdf",
+      "assets": [
+        "Commodities"
+      ],
+      "note": "Index total return column (not GSG ETF return)."
+    },
+    {
+      "id": "gsci-2011-2024",
+      "url": "https://www.marketscreener.com/quote/index/S-P-GSCI-TR-46869250/quotes/",
+      "assets": [
+        "Commodities"
+      ],
+      "note": "Secondary compilation of calendar-year total returns; 2024 cross-checked against S&P dashboard-us-2024-12.pdf.",
+      "retrieved": "2026-10-29"
+    },
+    {
+      "id": "gsci-2024-crosscheck",
+      "url": "https://www.spglobal.com/spdji/en/documents/performance-reports/dashboard-us-2024-12.pdf",
+      "assets": [
+        "Commodities"
+      ]
+    },
+    {
+      "id": "fx",
+      "url": "https://data-api.ecb.europa.eu/service/data/EXR/A.USD.EUR.SP00.E?startPeriod=2004&endPeriod=2024&format=csvdata",
+      "retrieved": "2026-10-29"
+    },
+    {
+      "id": "eonia",
+      "url": "https://data-api.ecb.europa.eu/service/data/EON/D.EONIA_TO.RATE?startPeriod=2004-12-30&endPeriod=2021-12-31&format=csvdata",
+      "retrieved": "2026-10-29"
+    },
+    {
+      "id": "estr",
+      "url": "https://data-api.ecb.europa.eu/service/data/EST/B.EU000A2X2A25.WT?startPeriod=2022-01-01&endPeriod=2024-12-31&format=csvdata",
+      "retrieved": "2026-10-29"
+    },
+    {
+      "id": "nyu-gold",
+      "url": "https://pages.stern.nyu.edu/~adamodar/New_Home_Page/datafile/histretSP.html",
+      "assets": [
+        "Gold"
+      ]
+    },
+    {
+      "id": "jpm-eur",
+      "url": "https://am.jpmorgan.com/content/dam/jpm-am-aem/global/en/insights/market-insights/guide-to-the-markets/mi-guide-to-the-markets-ce-en.pdf",
+      "assets": [
+        "Bond",
+        "Cash"
+      ]
+    },
+    {
+      "id": "ssga",
+      "url": "https://www.ssga.com/us/en/intermediary/insights/long-term-asset-class-forecasts-q1-2026",
+      "assets": [
+        "Stocks",
+        "Bond",
+        "REIT",
+        "Commodities",
+        "Cash"
+      ]
+    },
+    {
+      "id": "ubs",
+      "url": "https://www.ubs.com/global/en/wealthmanagement/insights/2025/global-investment-returns-yearbook.html",
+      "assets": [
+        "Stocks"
+      ]
+    }
+  ],
+  "annual": [
+    {
+      "year": 2008,
+      "usd_returns": {
+        "Gold": 4.32,
+        "Commodities": -46.49,
+        "Stocks": -40.71
+      },
+      "usd_per_eur_end": 1.3917,
+      "returns": {
+        "Gold": 10.346678,
+        "Commodities": -43.39867,
+        "Cash": 3.998504,
+        "Stocks": -37.284753,
+        "Bond": 6.22,
+        "REIT": -48.59
+      }
+    },
+    {
+      "year": 2009,
+      "usd_returns": {
+        "Gold": 25.04,
+        "Commodities": 13.49,
+        "Stocks": 29.99
+      },
+      "usd_per_eur_end": 1.4406,
+      "returns": {
+        "Gold": 20.795618,
+        "Commodities": 9.637674,
+        "Cash": 0.724557,
+        "Stocks": 25.577595,
+        "Bond": 6.95,
+        "REIT": 36.08
+      }
+    },
+    {
+      "year": 2010,
+      "usd_returns": {
+        "Gold": 29.24,
+        "Commodities": 9.03,
+        "Stocks": 11.76
+      },
+      "usd_per_eur_end": 1.3362,
+      "returns": {
+        "Gold": 39.337782,
+        "Commodities": 17.548734,
+        "Cash": 0.43787,
+        "Stocks": 20.492034,
+        "Bond": 2.18,
+        "REIT": 16.84
+      }
+    },
+    {
+      "year": 2011,
+      "usd_returns": {
+        "Gold": 12.02,
+        "Commodities": -1.18,
+        "Stocks": -5.54
+      },
+      "usd_per_eur_end": 1.2939,
+      "returns": {
+        "Gold": 15.682142,
+        "Commodities": 2.05061,
+        "Cash": 0.885721,
+        "Stocks": -2.451927,
+        "Bond": 3.24,
+        "REIT": -9.4
+      }
+    },
+    {
+      "year": 2012,
+      "usd_returns": {
+        "Gold": 5.68,
+        "Commodities": 0.08
+      },
+      "usd_per_eur_end": 1.3194,
+      "returns": {
+        "Gold": 3.637526,
+        "Commodities": -1.854243,
+        "Cash": 0.23432,
+        "Stocks": 14.05,
+        "Bond": 11.19,
+        "REIT": 28.7
+      }
+    },
+    {
+      "year": 2013,
+      "usd_returns": {
+        "Gold": -27.61,
+        "Commodities": -1.22
+      },
+      "usd_per_eur_end": 1.3791,
+      "returns": {
+        "Gold": -30.743698,
+        "Commodities": -5.496097,
+        "Cash": 0.092117,
+        "Stocks": 21.2,
+        "Bond": 2.17,
+        "REIT": 11.19
+      }
+    },
+    {
+      "year": 2014,
+      "usd_returns": {
+        "Gold": 0.12,
+        "Commodities": -33.06
+      },
+      "usd_per_eur_end": 1.2141,
+      "returns": {
+        "Gold": 13.726622,
+        "Commodities": -23.962644,
+        "Cash": 0.097906,
+        "Stocks": 19.5,
+        "Bond": 11.1,
+        "REIT": 25.73
+      }
+    },
+    {
+      "year": 2015,
+      "usd_returns": {
+        "Gold": -12.11,
+        "Commodities": -32.86
+      },
+      "usd_per_eur_end": 1.0887,
+      "returns": {
+        "Gold": -1.986545,
+        "Commodities": -25.126597,
+        "Cash": -0.107054,
+        "Stocks": 10.42,
+        "Bond": 1,
+        "REIT": 18.6
+      }
+    },
+    {
+      "year": 2016,
+      "usd_returns": {
+        "Gold": 8.1,
+        "Commodities": 11.37
+      },
+      "usd_per_eur_end": 1.0541,
+      "returns": {
+        "Gold": 11.648297,
+        "Commodities": 15.025632,
+        "Cash": -0.323668,
+        "Stocks": 10.73,
+        "Bond": 3.32,
+        "REIT": -5.8
+      }
+    },
+    {
+      "year": 2017,
+      "usd_returns": {
+        "Gold": 12.66,
+        "Commodities": 5.77
+      },
+      "usd_per_eur_end": 1.1993,
+      "returns": {
+        "Gold": -0.979817,
+        "Commodities": -7.03564,
+        "Cash": -0.358668,
+        "Stocks": 7.51,
+        "Bond": 0.68,
+        "REIT": 12.1
+      }
+    },
+    {
+      "year": 2018,
+      "usd_returns": {
+        "Gold": -0.93,
+        "Commodities": -13.82
+      },
+      "usd_per_eur_end": 1.145,
+      "returns": {
+        "Gold": 3.768254,
+        "Commodities": -9.733036,
+        "Cash": -0.366858,
+        "Stocks": -4.11,
+        "Bond": 0.41,
+        "REIT": -8.8
+      }
+    },
+    {
+      "year": 2019,
+      "usd_returns": {
+        "Gold": 19.08,
+        "Commodities": 17.63
+      },
+      "usd_per_eur_end": 1.1234,
+      "returns": {
+        "Gold": 21.369592,
+        "Commodities": 19.891713,
+        "Cash": -0.395886,
+        "Stocks": 30.02,
+        "Bond": 5.98,
+        "REIT": 29.3
+      }
+    },
+    {
+      "year": 2020,
+      "usd_returns": {
+        "Gold": 24.17,
+        "Commodities": -23.72
+      },
+      "usd_per_eur_end": 1.2271,
+      "returns": {
+        "Gold": 13.676618,
+        "Commodities": -30.166285,
+        "Cash": -0.467999,
+        "Stocks": 6.33,
+        "Bond": 4.05,
+        "REIT": -10.7
+      }
+    },
+    {
+      "year": 2021,
+      "usd_returns": {
+        "Gold": -3.75,
+        "Commodities": 40.35
+      },
+      "usd_per_eur_end": 1.1326,
+      "returns": {
+        "Gold": 4.280748,
+        "Commodities": 52.06029,
+        "Cash": -0.488407,
+        "Stocks": 31.07,
+        "Bond": -2.85,
+        "REIT": 17.6
+      }
+    },
+    {
+      "year": 2022,
+      "usd_returns": {
+        "Gold": 0.55,
+        "Commodities": 25.99
+      },
+      "usd_per_eur_end": 1.0666,
+      "returns": {
+        "Gold": 6.77192,
+        "Commodities": 33.786119,
+        "Cash": -0.006764,
+        "Stocks": -12.78,
+        "Bond": -17.17,
+        "REIT": -37.0
+      }
+    },
+    {
+      "year": 2023,
+      "usd_returns": {
+        "Gold": 13.26,
+        "Commodities": -4.27
+      },
+      "usd_per_eur_end": 1.105,
+      "returns": {
+        "Gold": 9.324087,
+        "Commodities": -7.596726,
+        "Cash": 3.305672,
+        "Stocks": 19.6,
+        "Bond": 7.19,
+        "REIT": 16.3
+      }
+    },
+    {
+      "year": 2024,
+      "usd_returns": {
+        "Gold": 25.96,
+        "Commodities": 9.25
+      },
+      "usd_per_eur_end": 1.0389,
+      "returns": {
+        "Gold": 33.974203,
+        "Commodities": 16.20103,
+        "Cash": 3.772381,
+        "Stocks": 26.6,
+        "Bond": 2.6,
+        "REIT": -3.6
+      }
+    }
+  ]
+}

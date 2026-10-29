@@ -9,6 +9,7 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "test": "vitest run",
+    "calibration:check": "node scripts/calibrate-assets.mjs --check && vitest run src/engine/historicalCalibration.test.ts",
     "typecheck": "tsc --noEmit",
     "icons": "node scripts/gen-icons.mjs"
   },
